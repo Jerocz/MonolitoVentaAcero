@@ -1,20 +1,24 @@
-"""Service Layer: orquesta el flujo Cotizacion -> anticipo -> Orden de Fabricacion."""
+"""Service Layer: orquesta el negocio. Aqui vive la logica que antes estaba
+en los modelos (calculo de anticipo, avance de estados, saldo)."""
 from datetime import date, timedelta
+from decimal import Decimal
 
 from django.db import transaction
 
 from ventas.domain.builders import CotizacionBuilder
 from ventas.domain.excepciones import PagoRechazadoError
+from ventas.domain.reglas import DIAS_FABRICACION, FRACCION_ANTICIPO, SECUENCIA_ETAPAS
 from ventas.infra.factories import PasarelaPagoFactory
 from ventas.models import Cliente, Cotizacion, OrdenFabricacion, Pago, Producto
-
-DIAS_FABRICACION = 20
 
 
 class CotizacionService:
     def __init__(self, pasarela=None):
-        # Inyeccion de dependencias: si no se pasa una pasarela, la crea la Factory.
         self.pasarela = pasarela or PasarelaPagoFactory.crear()
+
+    @staticmethod
+    def calcular_anticipo(total: Decimal) -> Decimal:
+        return (total * FRACCION_ANTICIPO).quantize(Decimal("0.01"))
 
     @transaction.atomic
     def crear_cotizacion(self, cliente_id, items):
@@ -30,7 +34,7 @@ class CotizacionService:
         cotizacion.estado = Cotizacion.Estado.ENVIADA
         cotizacion.save(update_fields=["estado"])
 
-        anticipo = cotizacion.anticipo_50()
+        anticipo = self.calcular_anticipo(cotizacion.total)
         resultado = self.pasarela.cobrar(anticipo, cliente.email)
 
         if not resultado.aprobado:
@@ -47,12 +51,31 @@ class CotizacionService:
                            aprobado=True, referencia=resultado.referencia)
         return cotizacion
 
-    @transaction.atomic
-    def pagar_saldo(self, orden_id):
+
+class OrdenService:
+    """Logica de la orden de fabricacion (estados y saldo)."""
+
+    def __init__(self, pasarela=None):
+        self.pasarela = pasarela or PasarelaPagoFactory.crear()
+
+    def avanzar_etapa(self, orden_id) -> OrdenFabricacion:
         orden = OrdenFabricacion.objects.get(pk=orden_id)
-        if orden.esta_pagado_saldo():
+        i = SECUENCIA_ETAPAS.index(orden.estado)
+        if i < len(SECUENCIA_ETAPAS) - 1:
+            orden.estado = SECUENCIA_ETAPAS[i + 1]
+            orden.save(update_fields=["estado"])
+        return orden
+
+    def saldo_pagado(self, orden) -> bool:
+        return orden.pagos.filter(tipo=Pago.Tipo.SALDO, aprobado=True).exists()
+
+    @transaction.atomic
+    def pagar_saldo(self, orden_id) -> OrdenFabricacion:
+        orden = OrdenFabricacion.objects.get(pk=orden_id)
+        if self.saldo_pagado(orden):
             return orden
-        saldo = orden.cotizacion.total - orden.cotizacion.anticipo_50()
+        anticipo = CotizacionService.calcular_anticipo(orden.cotizacion.total)
+        saldo = orden.cotizacion.total - anticipo
         resultado = self.pasarela.cobrar(saldo, orden.cotizacion.cliente.email)
         if not resultado.aprobado:
             raise PagoRechazadoError("La pasarela rechazo el saldo.")

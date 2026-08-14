@@ -1,26 +1,27 @@
-"""Capa de Interfaz: la vista solo captura datos y delega en el CotizacionService."""
-import json
+"""Vistas HTML (para la sustentacion). Solo delegan en los servicios;
+los calculos de display se piden a los servicios, no a los modelos."""
 import os
 
-from django.http import JsonResponse
 from django.shortcuts import redirect, render
-from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.decorators.csrf import csrf_exempt
 
 from ventas.domain.excepciones import PagoRechazadoError, PedidoInvalidoError
+from ventas.domain.reglas import SECUENCIA_ETAPAS
 from ventas.models import Cliente, Cotizacion, OrdenFabricacion, Producto
-from ventas.services import CotizacionService
+from ventas.services import CotizacionService, OrdenService
 
 
 class CotizacionFormView(View):
     def _contexto(self):
         env = os.getenv("ENV_TYPE", "MOCK").upper()
+        orden_srv = OrdenService()
+        ordenes = OrdenFabricacion.objects.select_related("cotizacion__cliente").order_by("-id")[:8]
         return {
             "clientes": Cliente.objects.all(),
             "productos": Producto.objects.all(),
             "cotizaciones": Cotizacion.objects.select_related("cliente").order_by("-id")[:8],
-            "ordenes": OrdenFabricacion.objects.select_related("cotizacion__cliente").order_by("-id")[:8],
+            "ordenes": [{"o": o, "saldo_pagado": orden_srv.saldo_pagado(o)} for o in ordenes],
+            "secuencia": SECUENCIA_ETAPAS,
             "env_type": env,
             "pasarela_nombre": "PasarelaReal" if env == "REAL" else "PasarelaMock",
         }
@@ -40,40 +41,22 @@ class CotizacionFormView(View):
                     "cantidad": request.POST.get("cantidad", 1),
                 }])
             contexto["resultado"] = cotizacion
+            contexto["resultado_anticipo"] = CotizacionService.calcular_anticipo(cotizacion.total)
         except (PedidoInvalidoError, PagoRechazadoError) as e:
             contexto["error"] = str(e)
-        contexto.update(
-            cotizaciones=Cotizacion.objects.select_related("cliente").order_by("-id")[:8],
-            ordenes=OrdenFabricacion.objects.select_related("cotizacion__cliente").order_by("-id")[:8])
         return render(request, "ventas/venta_form.html", contexto)
 
 
-class AvanzarEtapaView(View):
+class AvanzarEtapaWebView(View):
     def post(self, request, orden_id):
-        OrdenFabricacion.objects.get(pk=orden_id).avanzar_etapa()
+        OrdenService().avanzar_etapa(orden_id)
         return redirect("cotizacion_form")
 
 
-class PagarSaldoView(View):
+class PagarSaldoWebView(View):
     def post(self, request, orden_id):
         try:
-            CotizacionService().pagar_saldo(orden_id)
+            OrdenService().pagar_saldo(orden_id)
         except PagoRechazadoError:
             pass
         return redirect("cotizacion_form")
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class ProcesarCotizacionView(View):
-    """Endpoint JSON. La logica de negocio vive en el servicio, no aqui."""
-    def post(self, request):
-        datos = json.loads(request.body)
-        try:
-            cotizacion = CotizacionService().crear_cotizacion(
-                cliente_id=datos["cliente_id"], items=datos["items"])
-        except PedidoInvalidoError as e:
-            return JsonResponse({"error": str(e)}, status=400)
-        except PagoRechazadoError as e:
-            return JsonResponse({"error": str(e)}, status=402)
-        return JsonResponse({"cotizacion_id": cotizacion.pk, "estado": cotizacion.estado,
-                            "total": str(cotizacion.total)}, status=201)

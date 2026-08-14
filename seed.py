@@ -12,8 +12,10 @@ if Cliente.objects.exists():
 else:
     Cliente.objects.create(nombre="Restaurante El Fogon", nit_o_cedula="900111-1", tipo=Cliente.Tipo.RESTAURANTE, email="fogon@test.co")
     Cliente.objects.create(nombre="Hotel Poblado", nit_o_cedula="900222-2", tipo=Cliente.Tipo.HOTEL, email="hotel@test.co")
+    Cliente.objects.create(nombre="Camila Restrepo", nit_o_cedula="1017-555", tipo=Cliente.Tipo.PERSONA, email="camila@test.co")
+    Cliente.objects.create(nombre="Andres Gil", nit_o_cedula="1020-777", tipo=Cliente.Tipo.PERSONA, email="andres@test.co")
     Lamina.objects.create(nombre="Lamina 304", calibre_acero=304, precio_base_m2=120000, stock_m2=60)
     Meson.objects.create(nombre="Meson central", calibre_acero=304, precio_base_m2=120000, stock_m2=60)
     Campana.objects.create(nombre="Campana extractora", calibre_acero=430, precio_base_m2=90000, stock_m2=60)
     Freidora.objects.create(nombre="Freidora 2 canastas", calibre_acero=304, precio_base_m2=1500000, stock_m2=99)
-    print("Datos de ejemplo creados: 2 clientes y 4 productos.")
+    print("Datos de ejemplo creados: 4 clientes y 4 productos.")
