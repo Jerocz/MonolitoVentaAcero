@@ -1,7 +1,9 @@
-"""Pruebas: servicios (con inyeccion de dependencias), estrategias de precio
-y la API DRF con sus codigos de estado."""
+"""Pruebas: servicios (con inyeccion de dependencias), estrategias de precio,
+validacion a nivel de modelo y la API DRF con sus codigos de estado."""
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -50,6 +52,31 @@ class ServicioYEstrategiaTest(APITestCase):
             CotizacionService(pasarela=PasarelaRechaza()).crear_cotizacion(
                 self.cliente.id, [{"producto_id": self.lamina.id, "ancho_cm": 100, "largo_cm": 100}])
         self.assertEqual(Cotizacion.objects.filter(estado=Cotizacion.Estado.APROBADA).count(), 0)
+
+
+class ValidacionModeloTest(TestCase):
+    """El modelo se autovalida en save() (full_clean()), sin depender de
+    que el Builder o un formulario lo llamen primero."""
+
+    def test_producto_con_stock_negativo_no_se_puede_guardar(self):
+        with self.assertRaises(DjangoValidationError):
+            Lamina.objects.create(
+                nombre="Lamina", calibre_acero=304, precio_base_m2=100000, stock_m2=-1)
+
+    def test_producto_con_calibre_no_permitido_no_se_puede_guardar(self):
+        with self.assertRaises(DjangoValidationError):
+            Lamina.objects.create(
+                nombre="Lamina", calibre_acero=999, precio_base_m2=100000, stock_m2=10)
+
+    def test_pago_con_monto_cero_no_se_puede_guardar(self):
+        cliente = Cliente.objects.create(
+            nombre="Test", nit_o_cedula="1", tipo=Cliente.Tipo.PERSONA, email="t@test.co")
+        lamina = Lamina.objects.create(nombre="Lamina", calibre_acero=304, precio_base_m2=100000, stock_m2=10)
+        cot = CotizacionService(pasarela=PasarelaAprueba()).crear_cotizacion(
+            cliente.id, [{"producto_id": lamina.id, "ancho_cm": 100, "largo_cm": 100}])
+        from ventas.models import Pago
+        with self.assertRaises(DjangoValidationError):
+            Pago.objects.create(orden=cot.orden, tipo=Pago.Tipo.SALDO, monto=0, aprobado=True)
 
 
 class ApiTest(APITestCase):

@@ -1,8 +1,20 @@
 """
-Modelos de dominio (ANEMICOS): solo datos, relaciones y persistencia.
-Toda la logica de negocio (precios, stock, anticipos, estados) vive en
-la capa de servicios y en las estrategias de precio, no aqui.
+Modelos de dominio: datos, relaciones, persistencia y las validaciones de
+integridad propias de cada entidad (tipos, rangos, invariantes). La logica
+de negocio orquestada entre varias entidades (precios, stock cruzado,
+anticipos, estados) vive en la capa de servicios y en las estrategias de
+precio, no aqui.
+
+Cada modelo valida su propio estado antes de guardarse (`save()` llama a
+`full_clean()`), asi que un dato invalido nunca llega a la base de datos
+sin importar por que camino se creo el objeto (builder, admin, shell). El
+Builder y el Service Layer, mas arriba, atrapan `ValidationError` de Django
+y la traducen a `PedidoInvalidoError` para no filtrar un tipo de excepcion
+de framework hacia la capa de presentacion.
 """
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -18,6 +30,10 @@ class Cliente(models.Model):
     email = models.EmailField()
     telefono = models.CharField(max_length=20, blank=True)
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.nombre} ({self.get_tipo_display()})"
 
@@ -30,11 +46,23 @@ class Producto(models.Model):
         CAMPANA = "CAMPANA", "Campana extractora"
         FREIDORA = "FREIDORA", "Freidora (estandar)"
 
+    class Calibre(models.IntegerChoices):
+        C304 = 304, "304"
+        C430 = 430, "430"
+
     nombre = models.CharField(max_length=120)
-    calibre_acero = models.IntegerField()
-    precio_base_m2 = models.DecimalField(max_digits=12, decimal_places=2)
-    stock_m2 = models.DecimalField(max_digits=10, decimal_places=2)
+    calibre_acero = models.IntegerField(choices=Calibre.choices)
+    precio_base_m2 = models.DecimalField(
+        max_digits=12, decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))])
+    stock_m2 = models.DecimalField(
+        max_digits=10, decimal_places=2,
+        validators=[MinValueValidator(Decimal("0"))])
     tipo = models.CharField(max_length=10, choices=Tipo.choices)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.nombre} ({self.get_tipo_display()})"
@@ -76,7 +104,13 @@ class Cotizacion(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_vencimiento = models.DateField()
     estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.BORRADOR)
-    total = models.DecimalField(max_digits=14, decimal_places=2, default=0)
+    total = models.DecimalField(
+        max_digits=14, decimal_places=2, default=0,
+        validators=[MinValueValidator(Decimal("0"))])
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Cotizacion #{self.pk} - {self.cliente.nombre} - {self.estado}"
@@ -85,10 +119,20 @@ class Cotizacion(models.Model):
 class ItemCotizacion(models.Model):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items", on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
-    ancho_cm = models.DecimalField(max_digits=6, decimal_places=1)
-    largo_cm = models.DecimalField(max_digits=6, decimal_places=1)
-    cantidad = models.PositiveIntegerField(default=1)
-    subtotal = models.DecimalField(max_digits=14, decimal_places=2)
+    ancho_cm = models.DecimalField(
+        max_digits=6, decimal_places=1,
+        validators=[MinValueValidator(Decimal("0.1"))])
+    largo_cm = models.DecimalField(
+        max_digits=6, decimal_places=1,
+        validators=[MinValueValidator(Decimal("0.1"))])
+    cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+    subtotal = models.DecimalField(
+        max_digits=14, decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))])
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
 
 class OrdenFabricacion(models.Model):
@@ -104,6 +148,10 @@ class OrdenFabricacion(models.Model):
     estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.EN_COLA)
     fecha_estimada_entrega = models.DateField()
 
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Orden #{self.pk} - {self.get_estado_display()}"
 
@@ -115,10 +163,16 @@ class Pago(models.Model):
 
     orden = models.ForeignKey(OrdenFabricacion, on_delete=models.CASCADE, related_name="pagos")
     tipo = models.CharField(max_length=10, choices=Tipo.choices)
-    monto = models.DecimalField(max_digits=14, decimal_places=2)
+    monto = models.DecimalField(
+        max_digits=14, decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))])
     aprobado = models.BooleanField(default=False)
     referencia = models.CharField(max_length=64, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_tipo_display()} - ${self.monto} - orden #{self.orden_id}"

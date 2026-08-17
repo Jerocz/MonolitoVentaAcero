@@ -3,7 +3,9 @@ Usa las estrategias de precio; no depende de logica en los modelos."""
 from datetime import date, timedelta
 from decimal import Decimal
 
-from ventas.domain.excepciones import PedidoInvalidoError
+from django.core.exceptions import ValidationError as DjangoValidationError
+
+from ventas.domain.excepciones import PedidoInvalidoError, mensaje_de
 from ventas.domain.precios import estrategia_para
 from ventas.domain.reglas import DIAS_VIGENCIA_COTIZACION
 from ventas.models import Cotizacion, ItemCotizacion
@@ -50,22 +52,28 @@ class CotizacionBuilder:
 
     def build(self):
         self._validar()
-        cotizacion = Cotizacion.objects.create(
-            cliente=self._cliente,
-            fecha_vencimiento=date.today() + timedelta(days=DIAS_VIGENCIA_COTIZACION),
-        )
-        total = Decimal("0")
-        for item in self._items:
-            producto = item["producto"]
-            estrategia = estrategia_para(producto.tipo)
-            subtotal = estrategia.calcular(
-                producto.precio_base_m2, item["ancho"], item["largo"], item["cantidad"])
-            ItemCotizacion.objects.create(
-                cotizacion=cotizacion, producto=producto, ancho_cm=item["ancho"],
-                largo_cm=item["largo"], cantidad=item["cantidad"], subtotal=subtotal)
-            producto.stock_m2 -= self._area_m2(item)
-            producto.save(update_fields=["stock_m2"])
-            total += subtotal
-        cotizacion.total = total
-        cotizacion.save(update_fields=["total"])
+        try:
+            cotizacion = Cotizacion.objects.create(
+                cliente=self._cliente,
+                fecha_vencimiento=date.today() + timedelta(days=DIAS_VIGENCIA_COTIZACION),
+            )
+            total = Decimal("0")
+            for item in self._items:
+                producto = item["producto"]
+                estrategia = estrategia_para(producto.tipo)
+                subtotal = estrategia.calcular(
+                    producto.precio_base_m2, item["ancho"], item["largo"], item["cantidad"])
+                ItemCotizacion.objects.create(
+                    cotizacion=cotizacion, producto=producto, ancho_cm=item["ancho"],
+                    largo_cm=item["largo"], cantidad=item["cantidad"], subtotal=subtotal)
+                producto.stock_m2 -= self._area_m2(item)
+                producto.save(update_fields=["stock_m2"])
+                total += subtotal
+            cotizacion.total = total
+            cotizacion.save(update_fields=["total"])
+        except DjangoValidationError as e:
+            # Cada modelo valida su propio estado en save() (full_clean()).
+            # Se traduce a la excepcion de dominio para no filtrar un tipo
+            # de excepcion de Django hacia la capa de presentacion.
+            raise PedidoInvalidoError(mensaje_de(e)) from e
         return cotizacion

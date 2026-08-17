@@ -39,6 +39,18 @@ ENV_TYPE=REAL python manage.py runserver
 La logica de negocio no se toco: `services.py`, `domain/` (Strategy de precios,
 Builder de cotizacion, reglas) e `infra/` (Factory de pasarelas) quedan igual.
 
+## Wiki tecnica (Entrega No. 1)
+
+Ver [`wiki/Home.md`](wiki/Home.md): justificacion de la estructura de
+carpetas, diagrama de secuencia de `crear_cotizacion` y vision de
+escalabilidad (API Gateway). Cada archivo de `wiki/` corresponde a una
+pagina de la Wiki de GitHub.
+
+Los modelos ahora se autovalidan antes de guardarse (`save()` llama
+`full_clean()`): tipos, rangos y choices se verifican a nivel de
+modelo/entidad ademas de las reglas de negocio del `CotizacionBuilder`.
+Ver detalle en [`wiki/Diagrama-de-Secuencia-Cotizacion.md`](wiki/Diagrama-de-Secuencia-Cotizacion.md).
+
 ## Estructura
 
 ```
