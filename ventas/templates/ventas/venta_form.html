@@ -230,7 +230,7 @@
       <div class="error"><strong>No podemos fabricarlo así:</strong> {{ error }}</div>
     {% endif %}
 
-    <form class="cotizar" method="post" action="{% url 'cotizacion_form' %}">
+    <form class="cotizar" method="post" action="{% url 'cotizacion_form' %}#cotizador">
       {% csrf_token %}
       <fieldset>
         <legend>Paso 1 · Cliente</legend>

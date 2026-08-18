@@ -3,6 +3,7 @@ los calculos de display se piden a los servicios, no a los modelos."""
 import os
 
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views import View
 
 from ventas.domain.excepciones import PagoRechazadoError, PedidoInvalidoError
@@ -50,7 +51,7 @@ class CotizacionFormView(View):
 class AvanzarEtapaWebView(View):
     def post(self, request, orden_id):
         OrdenService().avanzar_etapa(orden_id)
-        return redirect("cotizacion_form")
+        return redirect(reverse("cotizacion_form") + "#ordenes")
 
 
 class PagarSaldoWebView(View):
@@ -59,4 +60,4 @@ class PagarSaldoWebView(View):
             OrdenService().pagar_saldo(orden_id)
         except PagoRechazadoError:
             pass
-        return redirect("cotizacion_form")
+        return redirect(reverse("cotizacion_form") + "#ordenes")
