@@ -1,0 +1,65 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ms_catalogo\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Recurso no encontrado."
+msgstr "Resource not found."
+
+msgid "Método no permitido."
+msgstr "Method not allowed."
+
+msgid "Error interno del servicio."
+msgstr "Internal service error."
+
+msgid "El cuerpo debe ser un objeto JSON."
+msgstr "The body must be a JSON object."
+
+msgid "La cotización debe tener al menos un ítem."
+msgstr "The quote must have at least one item."
+
+msgid ""
+"Cada ítem necesita producto_id, ancho_cm, largo_cm y cantidad numéricos."
+msgstr "Each item needs numeric producto_id, ancho_cm, largo_cm and cantidad."
+
+msgid "El producto {producto_id} no existe."
+msgstr "Product {producto_id} does not exist."
+
+msgid "Medidas y cantidad deben ser positivas."
+msgstr "Dimensions and quantity must be positive."
+
+msgid "'{nombre}': el ancho mínimo es {minimo} cm."
+msgstr "'{nombre}': the minimum width is {minimo} cm."
+
+msgid "'{nombre}': stock insuficiente (pide {pedido}, hay {disponible})."
+msgstr ""
+"'{nombre}': insufficient stock (requested {pedido}, available {disponible})."
+
+msgid "Lámina a la medida"
+msgstr "Custom-cut sheet"
+
+msgid "Mesón"
+msgstr "Countertop"
+
+msgid "Campana extractora"
+msgstr "Extractor hood"
+
+msgid "Freidora (estándar)"
+msgstr "Fryer (standard)"
+
+msgid "Faltan campos o tienen un formato inválido."
+msgstr "Fields are missing or have an invalid format."
+
+msgid "Falta la referencia de la cotización."
+msgstr "The quote reference is missing."
+
+msgid "La reserva {referencia} no existe."
+msgstr "Reservation {referencia} does not exist."
+
+msgid "Catálogo de productos en acero inoxidable fabricados a la medida."
+msgstr "Catalog of custom-made stainless steel products."
