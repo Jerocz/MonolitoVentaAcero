@@ -1,0 +1,38 @@
+{% load i18n humanize %}
+<section class="blk wrap" id="catalogo">
+  <h2>{% translate "Lo que fabricamos" %}</h2>
+  <p class="sub">
+    {% translate "Precios por metro cuadrado en pesos colombianos. El precio final depende de tus medidas." %}
+    {% if tasa %}{% blocktranslate with fuente=tasa.fuente %}Equivalente en dólares según {{ fuente }}.{% endblocktranslate %}{% endif %}
+  </p>
+  <div class="cards">
+    {% for item in productos %}{% with p=item.p %}
+    <article class="card">
+      <div class="tag">{{ p.tipo_display }} · AISI {{ p.calibre_acero }}</div>
+      <h3>{{ p.nombre }}</h3>
+      <p>
+        {% if p.tipo == "LAMINA" %}{% translate "Lámina lisa para forrar muros, salpicaderos y mesas de trabajo. Se cobra el área real." %}
+        {% elif p.tipo == "MESON" %}{% translate "Mesón con refuerzo estructural y bordes doblados, listo para instalar sobre mueble." %}
+        {% elif p.tipo == "CAMPANA" %}{% translate "Campana con ductería incluida, para estufas residenciales o comerciales." %}
+        {% else %}{% translate "Equipo estándar en acero 304. No se fabrica a la medida." %}{% endif %}
+      </p>
+      <dl class="meta">
+        <div>
+          <dt>{% translate "Se vende" %}</dt>
+          <dd>{% if p.es_a_medida %}{% translate "Por m² a la medida" %}{% else %}{% translate "Por unidad" %}{% endif %}</dd>
+        </div>
+        <div>
+          <dt>{% translate "Disponible" %}</dt>
+          <dd>{{ p.stock_m2|floatformat:0 }} {% if p.es_a_medida %}m²{% else %}{% translate "unidades" %}{% endif %}</dd>
+        </div>
+      </dl>
+      <div class="price">${{ p.precio_base_m2|floatformat:0|intcomma }} <small>{% if p.es_a_medida %}/ m²{% else %}/ {% translate "unidad" %}{% endif %}</small>
+        {% if item.precio_usd %}<span class="usd">≈ US${{ item.precio_usd|floatformat:2|intcomma }}</span>{% endif %}
+      </div>
+      <a class="btn-ghost" style="text-align:center" href="#cotizador">{% translate "Cotizar este producto" %}</a>
+    </article>
+    {% endwith %}{% empty %}
+    <p class="sub">{% translate "El catálogo no tiene productos para mostrar en este momento." %}</p>
+    {% endfor %}
+  </div>
+</section>

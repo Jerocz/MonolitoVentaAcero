@@ -1,0 +1,41 @@
+{% load i18n humanize %}
+<section class="blk wrap" id="ordenes" style="padding-top:0">
+  <h2>{% translate "Órdenes de fabricación" %}</h2>
+  <p class="sub">{% translate "Etapa por etapa, desde la cola hasta la entrega." %}</p>
+  <div class="tabla-scroll">
+  <table>
+    <caption class="mono" style="text-align:left;padding:0 0 10px">{% translate "Últimas órdenes registradas en el servicio de fabricación" %}</caption>
+    <tr>
+      <th scope="col">{% translate "Orden" %}</th><th scope="col">{% translate "Cliente" %}</th><th scope="col">{% translate "Etapa" %}</th><th scope="col">{% translate "Progreso" %}</th><th scope="col" class="right">{% translate "Acciones" %}</th>
+    </tr>
+    {% for row in ordenes %}{% with o=row.o %}
+    <tr>
+      <td style="font-weight:600">#{{ o.id }}</td>
+      <td>
+        {{ o.cliente }}
+        <div class="mono" style="letter-spacing:.4px;margin-top:3px">${{ o.total|floatformat:0|intcomma }} · {% if not pagos_ok %}{% translate "saldo: sin información" %}{% elif row.saldo_pagado %}{% translate "saldo pagado" %}{% else %}{% translate "saldo pendiente" %}{% endif %}</div>
+      </td>
+      <td><span class="badge b-{{ o.estado }}">{{ o.estado_display }}</span></td>
+      <td>
+        <div class="pipeline" role="img" aria-label="{% blocktranslate with p=o.progreso %}Progreso {{ p }}%{% endblocktranslate %}">
+          {% for i in etapas %}<i class="{% if i < o.indice_etapa or o.progreso == 100 %}done{% elif i == o.indice_etapa %}on{% endif %}"></i>{% endfor %}
+        </div>
+        <div class="pipe-txt">{% blocktranslate with fecha=o.fecha_estimada_entrega|date:"SHORT_DATE_FORMAT" %}Entrega estimada {{ fecha }}{% endblocktranslate %}</div>
+      </td>
+      <td class="right">
+        <div class="acts">
+          {% if o.estado != "ENTREGADA" %}
+          <form class="inline" method="post" action="{% url 'avanzar_etapa' o.id %}">{% csrf_token %}<button class="btn-sm" type="submit">{% translate "Avanzar etapa" %}</button></form>
+          {% endif %}
+          {% if pagos_ok and not row.saldo_pagado %}
+          <form class="inline" method="post" action="{% url 'pagar_saldo' o.id %}" data-confirm="{% blocktranslate with id=o.id %}¿Confirmas el cobro del saldo de la orden #{{ id }}?{% endblocktranslate %}">{% csrf_token %}<button class="btn-sm solid" type="submit">{% translate "Pagar saldo" %}</button></form>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endwith %}{% empty %}
+    <tr><td colspan="5" class="vacio">{% translate "Aún no hay órdenes. Cotiza arriba para crear la primera." %}</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+</section>

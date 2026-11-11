@@ -1,0 +1,77 @@
+{% load i18n humanize %}
+<section class="blk wrap" id="cotizador" style="max-width:900px">
+  <h2>{% translate "Cotiza a la medida" %}</h2>
+  <p class="sub">{% translate "Ancho mínimo 60 cm en productos a la medida. Al cotizar se cobra el anticipo del 50% y se abre tu orden de fabricación." %}</p>
+
+  {% if resultado %}
+    <div class="ok" role="status">
+      <strong>{% blocktranslate with ref=resultado.referencia %}Cotización {{ ref }}{% endblocktranslate %}</strong> — {{ resultado.cliente.nombre }}<br>
+      {% translate "Estado" %}: <span class="badge b-{{ resultado.estado }}">{{ resultado.get_estado_display }}</span>
+      &nbsp;|&nbsp; {% translate "Total" %}: <strong>${{ resultado.total|floatformat:0|intcomma }}</strong>
+      &nbsp;|&nbsp; {% translate "Anticipo cobrado (50%)" %}: <strong>${{ resultado.anticipo|floatformat:0|intcomma }}</strong>
+      <br>
+      {% if resultado.orden_ref %}
+        {% blocktranslate with orden=resultado.orden_ref %}Se generó la orden de fabricación #{{ orden }}.{% endblocktranslate %}
+      {% else %}
+        {% translate "La orden de fabricación se está creando en segundo plano." %}
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    <div class="error" role="alert">
+      <strong>{% translate "No podemos fabricarlo así:" %}</strong>
+      <ul>{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    </div>
+  {% elif form.errors %}
+    <div class="error" role="alert"><strong>{% translate "Revisa los campos marcados en rojo." %}</strong></div>
+  {% endif %}
+
+  <form class="cotizar" method="post" action="{% url 'cotizacion_form' %}#cotizador" novalidate>
+    {% csrf_token %}
+    <fieldset>
+      <legend>{% translate "Paso 1 · Cliente" %}</legend>
+      {% with f=form.cliente_id %}
+      <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+      <select id="{{ f.id_for_label }}" name="{{ f.html_name }}" required{% if f.errors %} aria-invalid="true" aria-describedby="err-cliente"{% endif %}>
+        {% for valor, texto in f.field.choices %}<option value="{{ valor }}"{% if f.value|stringformat:"s" == valor|stringformat:"s" %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+      </select>
+      {% if f.errors %}<p class="campo-error" id="err-cliente">{{ f.errors.0 }}</p>{% endif %}
+      {% endwith %}
+    </fieldset>
+    <fieldset>
+      <legend>{% translate "Paso 2 · Producto y medidas" %}</legend>
+      {% with f=form.producto_id %}
+      <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+      <select id="{{ f.id_for_label }}" name="{{ f.html_name }}" required{% if f.errors %} aria-invalid="true" aria-describedby="err-producto"{% endif %}>
+        {% for valor, texto in f.field.choices %}<option value="{{ valor }}"{% if f.value|stringformat:"s" == valor|stringformat:"s" %} selected{% endif %}>{{ texto }}</option>{% endfor %}
+      </select>
+      {% if f.errors %}<p class="campo-error" id="err-producto">{{ f.errors.0 }}</p>{% endif %}
+      {% endwith %}
+      <div class="grid3" style="margin-top:18px">
+        {% with f=form.ancho_cm %}
+        <div>
+          <label for="{{ f.id_for_label }}">{{ f.label }} <span class="hint">{% translate "mín. 60" %}</span></label>
+          <input id="{{ f.id_for_label }}" type="number" step="0.1" min="0.1" max="1000" inputmode="decimal" name="{{ f.html_name }}" value="{{ f.value|default_if_none:''|stringformat:'s' }}" required{% if f.errors %} aria-invalid="true" aria-describedby="err-ancho"{% endif %}>
+          {% if f.errors %}<p class="campo-error" id="err-ancho">{{ f.errors.0 }}</p>{% endif %}
+        </div>
+        {% endwith %}
+        {% with f=form.largo_cm %}
+        <div>
+          <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+          <input id="{{ f.id_for_label }}" type="number" step="0.1" min="0.1" max="1000" inputmode="decimal" name="{{ f.html_name }}" value="{{ f.value|default_if_none:''|stringformat:'s' }}" required{% if f.errors %} aria-invalid="true" aria-describedby="err-largo"{% endif %}>
+          {% if f.errors %}<p class="campo-error" id="err-largo">{{ f.errors.0 }}</p>{% endif %}
+        </div>
+        {% endwith %}
+        {% with f=form.cantidad %}
+        <div>
+          <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+          <input id="{{ f.id_for_label }}" type="number" step="1" min="1" max="50" inputmode="numeric" name="{{ f.html_name }}" value="{{ f.value|default_if_none:'' }}" required{% if f.errors %} aria-invalid="true" aria-describedby="err-cantidad"{% endif %}>
+          {% if f.errors %}<p class="campo-error" id="err-cantidad">{{ f.errors.0 }}</p>{% endif %}
+        </div>
+        {% endwith %}
+      </div>
+    </fieldset>
+    <button class="cta" type="submit" data-enviando="{% translate 'Procesando pago…' %}">{% translate "Cotizar y pagar anticipo del 50%" %}</button>
+  </form>
+</section>

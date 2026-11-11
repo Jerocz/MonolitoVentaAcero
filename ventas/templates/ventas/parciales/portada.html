@@ -1,0 +1,20 @@
+{% load static i18n %}
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="pill">{% translate "Calibres 304 y 430 · Fabricación propia" %}</div>
+      <h1>{% translate "Acero inoxidable" %}<br>{% translate "cortado a tu medida" %}</h1>
+      <p class="lead">{% translate "Láminas, mesones y campanas para tu cocina o tu remodelación. Nos dices las medidas, te damos el precio al instante y fabricamos en 20 días." %}</p>
+      <div class="btns">
+        <a class="cta" href="#cotizador">{% translate "Calcular mi precio" %}</a>
+        <a class="btn-ghost" href="#catalogo">{% translate "Ver el catálogo" %}</a>
+      </div>
+      <div class="facts">
+        <div><b>{% translate "20 días" %}</b><small>{% translate "de fabricación" %}</small></div>
+        <div><b>50%</b><small>{% translate "de anticipo, resto al entregar" %}</small></div>
+        <div><b>{% translate "15 días" %}</b><small>{% translate "de vigencia de la cotización" %}</small></div>
+      </div>
+    </div>
+    <div class="hero-img" role="img" aria-label="{% translate 'Cocina en acero inoxidable' %}" style="background-image:url('{% static 'ventas/cocina.png' %}')"></div>
+  </div>
+</section>
