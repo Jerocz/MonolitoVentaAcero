@@ -1,0 +1,45 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ms_fabricacion\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Recurso no encontrado."
+msgstr "Resource not found."
+
+msgid "Método no permitido."
+msgstr "Method not allowed."
+
+msgid "Error interno del servicio."
+msgstr "Internal service error."
+
+msgid "En cola"
+msgstr "Queued"
+
+msgid "Corte"
+msgstr "Cutting"
+
+msgid "Soldadura"
+msgstr "Welding"
+
+msgid "Pulido"
+msgstr "Polishing"
+
+msgid "Terminada"
+msgstr "Finished"
+
+msgid "Entregada"
+msgstr "Delivered"
+
+msgid "Se requieren cotizacion_ref, cliente y total."
+msgstr "cotizacion_ref, cliente and total are required."
+
+msgid "La orden {id} no existe."
+msgstr "Order {id} does not exist."
+
+msgid "La orden {id} ya fue entregada."
+msgstr "Order {id} has already been delivered."
