@@ -4,40 +4,43 @@ Responsabilidades migradas desde Django:
   - Ordenes de fabricacion (antes: modelo OrdenFabricacion).
   - Secuencia de etapas y su avance (antes: reglas.py / OrdenService.avanzar_etapa).
   - Historial de cambios de etapa (nuevo: trazabilidad).
+
+Estructura:
+    config.py          configuracion desde variables de entorno
+    db.py              motor y unidad de trabajo (SQLAlchemy)
+    modelos.py         ordenes y eventos
+    dominio/           secuencia de etapas y errores
+    servicios.py       casos de uso (crear, listar, avanzar)
+    serializadores.py  modelos -> JSON
+    rutas/             endpoints HTTP, un archivo por recurso
+    errores_http.py    traduccion de errores a respuestas JSON
+    i18n.py            traducciones gettext (es/en)
 """
-import os
+from flask import Flask
 
-from flask import Flask, jsonify
-
+from app.config import Config
 from app.db import BaseDeDatos
-from app.i18n import _
+from app.errores_http import registrar_manejadores
 
 
 def create_app(database_url: str | None = None) -> Flask:
+    config = Config.desde_entorno()
+    url = database_url or config.database_url
+
     app = Flask(__name__)
     app.json.sort_keys = False
     app.json.ensure_ascii = False
-    url = database_url or os.getenv("DATABASE_URL", "sqlite:///fabricacion.sqlite3")
+    app.config.update(SERVICIO=config.nombre_servicio)
+
     db = BaseDeDatos(url)
     app.extensions["db"] = db
 
     from app import modelos  # noqa: F401
-    from app.rutas import bp
-    app.register_blueprint(bp)
+    from app.rutas import BLUEPRINTS
+    for bp in BLUEPRINTS:
+        app.register_blueprint(bp)
+    registrar_manejadores(app)
 
     if url.startswith("sqlite"):
         db.crear_tablas()
-
-    @app.errorhandler(404)
-    def _no_encontrado(_e):
-        return jsonify({"error": _("Recurso no encontrado."), "codigo": "NO_ENCONTRADO"}), 404
-
-    @app.errorhandler(405)
-    def _metodo(_e):
-        return jsonify({"error": _("Método no permitido."), "codigo": "METODO_NO_PERMITIDO"}), 405
-
-    @app.errorhandler(500)
-    def _interno(_e):
-        return jsonify({"error": _("Error interno del servicio."), "codigo": "ERROR_INTERNO"}), 500
-
     return app

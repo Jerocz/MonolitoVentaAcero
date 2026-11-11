@@ -1,10 +1,10 @@
 """Crea las tablas del microservicio. Uso: python -m app.init_db"""
-import os
 import time
 
 from sqlalchemy.exc import OperationalError
 
 from app import modelos  # noqa: F401
+from app.config import Config
 from app.db import BaseDeDatos
 
 
@@ -19,4 +19,4 @@ def inicializar(db: BaseDeDatos):
 
 
 if __name__ == "__main__":
-    inicializar(BaseDeDatos(os.getenv("DATABASE_URL", "sqlite:///fabricacion.sqlite3")))
+    inicializar(BaseDeDatos(Config.desde_entorno().database_url))
