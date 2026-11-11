@@ -1,0 +1,7 @@
+# Los scripts que corren dentro de Linux (Docker / EC2) deben tener fin de linea LF.
+*.sh        text eol=lf
+*.conf      text eol=lf
+Dockerfile  text eol=lf
+*.yml       text eol=lf
+*.mo        binary
+*.png       binary
