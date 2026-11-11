@@ -5,7 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
     DJANGO_STATIC_ROOT=/srv/static \
-    DJANGO_MEDIA_ROOT=/srv/media
+    DJANGO_MEDIA_ROOT=/srv/media \
+    DJANGO_SETTINGS_MODULE=monolito_venta_acero.settings.produccion
 
 WORKDIR /srv/app
 COPY requirements.txt .

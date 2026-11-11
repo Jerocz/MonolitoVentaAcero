@@ -7,7 +7,7 @@ import os
 
 from celery import Celery
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "monolito_venta_acero.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "monolito_venta_acero.settings.desarrollo")
 
 app = Celery("monolito_venta_acero")
 app.config_from_object("django.conf:settings", namespace="CELERY")
