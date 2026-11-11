@@ -1,11 +1,11 @@
 """Crea las tablas y carga el catalogo inicial. Uso: python -m app.init_db"""
-import os
 import time
 from decimal import Decimal
 
 from sqlalchemy import func, select
 from sqlalchemy.exc import OperationalError
 
+from app.config import Config
 from app.db import BaseDeDatos
 from app.modelos import Producto
 
@@ -33,4 +33,4 @@ def inicializar(db: BaseDeDatos):
 
 
 if __name__ == "__main__":
-    inicializar(BaseDeDatos(os.getenv("DATABASE_URL", "sqlite:///catalogo.sqlite3")))
+    inicializar(BaseDeDatos(Config.desde_entorno().database_url))

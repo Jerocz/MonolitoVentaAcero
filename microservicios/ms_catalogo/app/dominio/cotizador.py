@@ -6,33 +6,9 @@ las lineas con precio o levantan `ReglaNegocioError`. No tocan la base de datos.
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
+from app.dominio.errores import ProductoNoEncontradoError, ReglaNegocioError, SolicitudInvalidaError
 from app.dominio.precios import estrategia_para
 from app.i18n import _
-
-
-class ErrorCatalogo(Exception):
-    status = 400
-    codigo = "SOLICITUD_INVALIDA"
-
-    def __init__(self, mensaje, codigo=None):
-        super().__init__(mensaje)
-        self.mensaje = mensaje
-        if codigo:
-            self.codigo = codigo
-
-
-class SolicitudInvalidaError(ErrorCatalogo):
-    status = 400
-
-
-class ProductoNoEncontradoError(ErrorCatalogo):
-    status = 404
-    codigo = "PRODUCTO_NO_EXISTE"
-
-
-class ReglaNegocioError(ErrorCatalogo):
-    status = 409
-    codigo = "REGLA_NEGOCIO"
 
 
 @dataclass
