@@ -9,6 +9,16 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from ventas.domain.dtos import (
+    CobroDTO,
+    EstadoPagoDTO,
+    InfoAliadoDTO,
+    LineaReservadaDTO,
+    OrdenDTO,
+    ProductoDTO,
+    ReservaDTO,
+    TasaCambioDTO,
+)
 from ventas.domain.excepciones import (
     OperacionNoPermitidaError,
     PedidoInvalidoError,
@@ -17,18 +27,10 @@ from ventas.domain.excepciones import (
 )
 from ventas.domain.puertos import (
     CatalogoPort,
-    CobroDTO,
     ColaTareasPort,
-    EstadoPagoDTO,
     FabricacionPort,
-    InfoAliadoDTO,
-    LineaReservadaDTO,
-    OrdenDTO,
     PagosPort,
-    ProductoDTO,
-    ReservaDTO,
     ServicioAliadoPort,
-    TasaCambioDTO,
     TasaCambioPort,
 )
 from ventas.infra.contenedor import Contenedor

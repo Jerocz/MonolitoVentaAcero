@@ -17,8 +17,9 @@ from decimal import Decimal, InvalidOperation
 
 from django.core.cache import cache
 
+from ventas.domain.dtos import TasaCambioDTO
 from ventas.domain.excepciones import ServicioNoDisponibleError
-from ventas.domain.puertos import TasaCambioDTO, TasaCambioPort
+from ventas.domain.puertos import TasaCambioPort
 from ventas.infra.http import ClienteHttp
 
 log = logging.getLogger(__name__)

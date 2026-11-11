@@ -12,8 +12,9 @@ Se configura con las variables de entorno ALIADO_API_URL y ALIADO_NOMBRE.
 from django.core.cache import cache
 from django.utils.translation import gettext as _
 
+from ventas.domain.dtos import InfoAliadoDTO
 from ventas.domain.excepciones import ServicioNoDisponibleError
-from ventas.domain.puertos import InfoAliadoDTO, ServicioAliadoPort
+from ventas.domain.puertos import ServicioAliadoPort
 from ventas.infra.http import ClienteHttp
 
 MAX_ELEMENTOS = 12

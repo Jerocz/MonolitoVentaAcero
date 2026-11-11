@@ -5,9 +5,9 @@ from django.core.cache import cache
 from django.test import SimpleTestCase, override_settings
 
 from ventas.domain.excepciones import ServicioNoDisponibleError
-from ventas.infra.aliado import AliadoHttpAdapter, normalizar
+from ventas.infra.externos.aliado import AliadoHttpAdapter, normalizar
+from ventas.infra.externos.tasa_cambio import ExchangeRateApiAdapter, TasaCambioConRespaldo, TasaCambioFija
 from ventas.infra.http import CircuitBreaker, ClienteHttp, RespuestaHttp
-from ventas.infra.terceros import ExchangeRateApiAdapter, TasaCambioConRespaldo, TasaCambioFija
 
 
 class Reloj:
