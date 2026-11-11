@@ -4,43 +4,47 @@ Responsabilidades migradas desde Django:
   - Pasarelas de pago real/mock y su Factory (antes: ventas/infra/).
   - Calculo del anticipo (50%) y del saldo final (antes: services.py).
   - Registro de cobros (antes: modelo Pago).
+
+Estructura:
+    config.py          configuracion desde variables de entorno
+    db.py              motor y unidad de trabajo (SQLAlchemy)
+    modelos.py         tabla de cobros
+    dominio/           reglas de cobro y errores
+    infra/             pasarelas de pago + Factory
+    servicios.py       casos de uso (anticipo, saldo, historial, estado)
+    serializadores.py  modelos -> JSON
+    rutas/             endpoints HTTP, un archivo por recurso
+    errores_http.py    traduccion de errores a respuestas JSON
+    i18n.py            traducciones gettext (es/en)
 """
-import os
+from flask import Flask
 
-from flask import Flask, jsonify
-
+from app.config import Config
 from app.db import BaseDeDatos
-from app.i18n import _
+from app.errores_http import registrar_manejadores
 from app.infra.pasarelas import PasarelaPago, PasarelaPagoFactory
 
 
 def create_app(database_url: str | None = None, pasarela: PasarelaPago | None = None) -> Flask:
+    config = Config.desde_entorno()
+    url = database_url or config.database_url
+
     app = Flask(__name__)
     app.json.sort_keys = False
     app.json.ensure_ascii = False
-    url = database_url or os.getenv("DATABASE_URL", "sqlite:///pagos.sqlite3")
+    app.config.update(SERVICIO=config.nombre_servicio)
+
     db = BaseDeDatos(url)
     app.extensions["db"] = db
     # Inyeccion de dependencias: las pruebas pueden pasar su propia pasarela.
-    app.extensions["pasarela"] = pasarela or PasarelaPagoFactory.crear()
+    app.extensions["pasarela"] = pasarela or PasarelaPagoFactory.crear(config.tipo_pasarela)
 
     from app import modelos  # noqa: F401
-    from app.rutas import bp
-    app.register_blueprint(bp)
+    from app.rutas import BLUEPRINTS
+    for bp in BLUEPRINTS:
+        app.register_blueprint(bp)
+    registrar_manejadores(app)
 
     if url.startswith("sqlite"):
         db.crear_tablas()
-
-    @app.errorhandler(404)
-    def _no_encontrado(_e):
-        return jsonify({"error": _("Recurso no encontrado."), "codigo": "NO_ENCONTRADO"}), 404
-
-    @app.errorhandler(405)
-    def _metodo(_e):
-        return jsonify({"error": _("Método no permitido."), "codigo": "METODO_NO_PERMITIDO"}), 405
-
-    @app.errorhandler(500)
-    def _interno(_e):
-        return jsonify({"error": _("Error interno del servicio."), "codigo": "ERROR_INTERNO"}), 500
-
     return app

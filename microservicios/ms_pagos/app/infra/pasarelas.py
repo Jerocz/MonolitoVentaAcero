@@ -1,9 +1,8 @@
 """Pasarelas de pago (migradas desde ventas/infra/pasarelas.py) + Factory.
 
 Mismo contrato para la pasarela real y la simulada; la Factory elige segun
-la variable de entorno ENV_TYPE (MOCK por defecto).
+el tipo configurado (variable de entorno ENV_TYPE, MOCK por defecto).
 """
-import os
 import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -44,7 +43,7 @@ class PasarelaMock(PasarelaPago):
 
 class PasarelaPagoFactory:
     @staticmethod
-    def crear() -> PasarelaPago:
-        if os.getenv("ENV_TYPE", "MOCK").upper() == "REAL":
+    def crear(tipo: str = "MOCK") -> PasarelaPago:
+        if tipo.upper() == "REAL":
             return PasarelaReal()
         return PasarelaMock()
