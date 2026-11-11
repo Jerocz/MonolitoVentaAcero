@@ -1,21 +1,30 @@
-"""Crea datos de ejemplo para ver la pagina con contenido. Ejecuta: python seed.py"""
+"""Crea clientes de ejemplo en el monolito. Ejecuta: python seed.py
+
+Los productos ya NO se crean aqui: el catalogo es propiedad de ms-catalogo,
+que carga su catalogo inicial al arrancar (microservicios/ms_catalogo/app/init_db.py).
+"""
 import os
+
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "monolito_venta_acero.settings")
 django.setup()
 
-from ventas.models import Campana, Cliente, Freidora, Lamina, Meson
+from ventas.models import Cliente  # noqa: E402
+
+CLIENTES = [
+    ("Restaurante El Fogon", "900111-1", Cliente.Tipo.RESTAURANTE, "fogon@test.co"),
+    ("Hotel Poblado", "900222-2", Cliente.Tipo.HOTEL, "hotel@test.co"),
+    ("Camila Restrepo", "1017-555", Cliente.Tipo.PERSONA, "camila@test.co"),
+    ("Andres Gil", "1020-777", Cliente.Tipo.PERSONA, "andres@test.co"),
+    # Su correo hace que la pasarela simulada RECHACE el pago: sirve para
+    # demostrar la compensacion de la saga (se libera el stock reservado).
+    ("Cliente Prueba Rechazo", "000-000", Cliente.Tipo.PERSONA, "pagos@rechazo.test"),
+]
 
 if Cliente.objects.exists():
-    print("Ya hay datos. No se crea nada.")
+    print("Ya hay clientes. No se crea nada.")
 else:
-    Cliente.objects.create(nombre="Restaurante El Fogon", nit_o_cedula="900111-1", tipo=Cliente.Tipo.RESTAURANTE, email="fogon@test.co")
-    Cliente.objects.create(nombre="Hotel Poblado", nit_o_cedula="900222-2", tipo=Cliente.Tipo.HOTEL, email="hotel@test.co")
-    Cliente.objects.create(nombre="Camila Restrepo", nit_o_cedula="1017-555", tipo=Cliente.Tipo.PERSONA, email="camila@test.co")
-    Cliente.objects.create(nombre="Andres Gil", nit_o_cedula="1020-777", tipo=Cliente.Tipo.PERSONA, email="andres@test.co")
-    Lamina.objects.create(nombre="Lamina 304", calibre_acero=304, precio_base_m2=120000, stock_m2=60)
-    Meson.objects.create(nombre="Meson central", calibre_acero=304, precio_base_m2=120000, stock_m2=60)
-    Campana.objects.create(nombre="Campana extractora", calibre_acero=430, precio_base_m2=90000, stock_m2=60)
-    Freidora.objects.create(nombre="Freidora 2 canastas", calibre_acero=304, precio_base_m2=1500000, stock_m2=99)
-    print("Datos de ejemplo creados: 4 clientes y 4 productos.")
+    for nombre, documento, tipo, email in CLIENTES:
+        Cliente.objects.create(nombre=nombre, nit_o_cedula=documento, tipo=tipo, email=email)
+    print(f"Clientes de ejemplo creados: {len(CLIENTES)}.")

@@ -1,178 +1,146 @@
 """
-Modelos de dominio: datos, relaciones, persistencia y las validaciones de
-integridad propias de cada entidad (tipos, rangos, invariantes). La logica
-de negocio orquestada entre varias entidades (precios, stock cruzado,
-anticipos, estados) vive en la capa de servicios y en las estrategias de
-precio, no aqui.
+Modelos que se QUEDAN en el monolito despues del Strangler Pattern.
+
+Migrados a microservicios (cada uno con su propia base de datos):
+  - Producto, Lamina, Meson, Campana, Freidora  -> ms-catalogo
+  - OrdenFabricacion                            -> ms-fabricacion
+  - Pago                                        -> ms-pagos
+
+El monolito conserva Clientes y Cotizaciones (el "pedido" que orquesta a los
+demas servicios), y los registros de los procesos en segundo plano
+(notificaciones y reportes generados por Celery). Entre servicios NO hay
+llaves foraneas: se guardan referencias (`producto_ref`, `orden_ref`) y una
+copia de los datos necesarios para mostrar la cotizacion aunque otro
+servicio este caido.
 
 Cada modelo valida su propio estado antes de guardarse (`save()` llama a
-`full_clean()`), asi que un dato invalido nunca llega a la base de datos
-sin importar por que camino se creo el objeto (builder, admin, shell). El
-Builder y el Service Layer, mas arriba, atrapan `ValidationError` de Django
-y la traducen a `PedidoInvalidoError` para no filtrar un tipo de excepcion
-de framework hacia la capa de presentacion.
+`full_clean()`), asi un dato invalido nunca llega a la base de datos.
 """
 from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from ventas.domain.reglas import referencia_cotizacion
 
 
-class Cliente(models.Model):
-    class Tipo(models.TextChoices):
-        RESTAURANTE = "RESTAURANTE", "Restaurante"
-        HOTEL = "HOTEL", "Hotel"
-        PERSONA = "PERSONA", "Persona natural"
-
-    nombre = models.CharField(max_length=120)
-    nit_o_cedula = models.CharField(max_length=30)
-    tipo = models.CharField(max_length=12, choices=Tipo.choices, default=Tipo.PERSONA)
-    email = models.EmailField()
-    telefono = models.CharField(max_length=20, blank=True)
+class AutoValidado(models.Model):
+    class Meta:
+        abstract = True
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return f"{self.nombre} ({self.get_tipo_display()})"
 
-
-class Producto(models.Model):
-    """Base del catalogo. Las subclases solo declaran su tipo."""
+class Cliente(AutoValidado):
     class Tipo(models.TextChoices):
-        LAMINA = "LAMINA", "Lamina a la medida"
-        MESON = "MESON", "Meson"
-        CAMPANA = "CAMPANA", "Campana extractora"
-        FREIDORA = "FREIDORA", "Freidora (estandar)"
+        RESTAURANTE = "RESTAURANTE", _("Restaurante")
+        HOTEL = "HOTEL", _("Hotel")
+        PERSONA = "PERSONA", _("Persona natural")
 
-    class Calibre(models.IntegerChoices):
-        C304 = 304, "304"
-        C430 = 430, "430"
+    nombre = models.CharField(_("nombre"), max_length=120)
+    nit_o_cedula = models.CharField(_("NIT o cédula"), max_length=30)
+    tipo = models.CharField(_("tipo"), max_length=12, choices=Tipo.choices, default=Tipo.PERSONA)
+    email = models.EmailField(_("correo electrónico"))
+    telefono = models.CharField(_("teléfono"), max_length=20, blank=True)
 
-    nombre = models.CharField(max_length=120)
-    calibre_acero = models.IntegerField(choices=Calibre.choices)
-    precio_base_m2 = models.DecimalField(
-        max_digits=12, decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"))])
-    stock_m2 = models.DecimalField(
-        max_digits=10, decimal_places=2,
-        validators=[MinValueValidator(Decimal("0"))])
-    tipo = models.CharField(max_length=10, choices=Tipo.choices)
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+    class Meta:
+        verbose_name = _("cliente")
+        verbose_name_plural = _("clientes")
 
     def __str__(self):
         return f"{self.nombre} ({self.get_tipo_display()})"
 
 
-class Lamina(Producto):
-    def save(self, *args, **kwargs):
-        self.tipo = Producto.Tipo.LAMINA
-        super().save(*args, **kwargs)
-
-
-class Meson(Producto):
-    def save(self, *args, **kwargs):
-        self.tipo = Producto.Tipo.MESON
-        super().save(*args, **kwargs)
-
-
-class Campana(Producto):
-    def save(self, *args, **kwargs):
-        self.tipo = Producto.Tipo.CAMPANA
-        super().save(*args, **kwargs)
-
-
-class Freidora(Producto):
-    def save(self, *args, **kwargs):
-        self.tipo = Producto.Tipo.FREIDORA
-        super().save(*args, **kwargs)
-
-
-class Cotizacion(models.Model):
+class Cotizacion(AutoValidado):
     class Estado(models.TextChoices):
-        BORRADOR = "BORRADOR", "Borrador"
-        ENVIADA = "ENVIADA", "Enviada al cliente"
-        APROBADA = "APROBADA", "Aprobada"
-        RECHAZADA = "RECHAZADA", "Rechazada"
-        VENCIDA = "VENCIDA", "Vencida"
+        BORRADOR = "BORRADOR", _("Borrador")
+        ENVIADA = "ENVIADA", _("Enviada al cliente")
+        APROBADA = "APROBADA", _("Aprobada")
+        RECHAZADA = "RECHAZADA", _("Rechazada")
+        VENCIDA = "VENCIDA", _("Vencida")
 
-    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name="cotizaciones")
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_vencimiento = models.DateField()
-    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.BORRADOR)
+    cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT, related_name="cotizaciones",
+                                verbose_name=_("cliente"))
+    fecha_creacion = models.DateTimeField(_("fecha de creación"), auto_now_add=True)
+    fecha_vencimiento = models.DateField(_("fecha de vencimiento"))
+    estado = models.CharField(_("estado"), max_length=10, choices=Estado.choices, default=Estado.BORRADOR)
     total = models.DecimalField(
-        max_digits=14, decimal_places=2, default=0,
+        _("total"), max_digits=14, decimal_places=2, default=0,
         validators=[MinValueValidator(Decimal("0"))])
+    anticipo = models.DecimalField(
+        _("anticipo cobrado"), max_digits=14, decimal_places=2, default=0,
+        validators=[MinValueValidator(Decimal("0"))])
+    # Id de la orden en ms-fabricacion (sin FK: vive en otra base de datos).
+    orden_ref = models.PositiveIntegerField(_("orden de fabricación"), null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+    class Meta:
+        verbose_name = _("cotización")
+        verbose_name_plural = _("cotizaciones")
+
+    @property
+    def referencia(self) -> str:
+        return referencia_cotizacion(self.pk)
 
     def __str__(self):
-        return f"Cotizacion #{self.pk} - {self.cliente.nombre} - {self.estado}"
+        return f"{self.referencia} - {self.cliente.nombre} - {self.get_estado_display()}"
 
 
-class ItemCotizacion(models.Model):
+class ItemCotizacion(AutoValidado):
     cotizacion = models.ForeignKey(Cotizacion, related_name="items", on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.PROTECT)
+    # Copia de los datos del producto (ms-catalogo es el duenio del producto).
+    producto_ref = models.PositiveIntegerField(_("producto"))
+    producto_nombre = models.CharField(_("nombre del producto"), max_length=120)
+    producto_tipo = models.CharField(_("tipo de producto"), max_length=10)
     ancho_cm = models.DecimalField(
-        max_digits=6, decimal_places=1,
-        validators=[MinValueValidator(Decimal("0.1"))])
+        _("ancho (cm)"), max_digits=6, decimal_places=1, validators=[MinValueValidator(Decimal("0.1"))])
     largo_cm = models.DecimalField(
-        max_digits=6, decimal_places=1,
-        validators=[MinValueValidator(Decimal("0.1"))])
-    cantidad = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
+        _("largo (cm)"), max_digits=6, decimal_places=1, validators=[MinValueValidator(Decimal("0.1"))])
+    cantidad = models.PositiveIntegerField(_("cantidad"), default=1, validators=[MinValueValidator(1)])
     subtotal = models.DecimalField(
-        max_digits=14, decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"))])
+        _("subtotal"), max_digits=14, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+    class Meta:
+        verbose_name = _("ítem de cotización")
+        verbose_name_plural = _("ítems de cotización")
 
 
-class OrdenFabricacion(models.Model):
+class Notificacion(models.Model):
+    """Registro de cada notificacion enviada por el worker de Celery."""
+    destinatario = models.EmailField(_("destinatario"))
+    asunto = models.CharField(_("asunto"), max_length=200)
+    cuerpo = models.TextField(_("mensaje"))
+    creada = models.DateTimeField(_("enviada"), auto_now_add=True)
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = _("notificación")
+        verbose_name_plural = _("notificaciones")
+
+    def __str__(self):
+        return f"{self.destinatario}: {self.asunto}"
+
+
+class ReporteVentas(models.Model):
+    """Reporte CSV generado en segundo plano por Celery."""
     class Estado(models.TextChoices):
-        EN_COLA = "EN_COLA", "En cola"
-        CORTE = "CORTE", "Corte"
-        SOLDADURA = "SOLDADURA", "Soldadura"
-        PULIDO = "PULIDO", "Pulido"
-        TERMINADA = "TERMINADA", "Terminada"
-        ENTREGADA = "ENTREGADA", "Entregada"
+        PENDIENTE = "PENDIENTE", _("En cola")
+        LISTO = "LISTO", _("Listo")
+        ERROR = "ERROR", _("Con error")
 
-    cotizacion = models.OneToOneField(Cotizacion, on_delete=models.PROTECT, related_name="orden")
-    estado = models.CharField(max_length=10, choices=Estado.choices, default=Estado.EN_COLA)
-    fecha_estimada_entrega = models.DateField()
+    estado = models.CharField(_("estado"), max_length=10, choices=Estado.choices, default=Estado.PENDIENTE)
+    archivo = models.FileField(_("archivo"), upload_to="reportes/", blank=True)
+    filas = models.PositiveIntegerField(_("filas"), default=0)
+    detalle = models.CharField(_("detalle"), max_length=255, blank=True)
+    solicitado = models.DateTimeField(_("solicitado"), auto_now_add=True)
+    terminado = models.DateTimeField(_("terminado"), null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Orden #{self.pk} - {self.get_estado_display()}"
-
-
-class Pago(models.Model):
-    class Tipo(models.TextChoices):
-        ANTICIPO = "ANTICIPO", "Anticipo (50%)"
-        SALDO = "SALDO", "Saldo final"
-
-    orden = models.ForeignKey(OrdenFabricacion, on_delete=models.CASCADE, related_name="pagos")
-    tipo = models.CharField(max_length=10, choices=Tipo.choices)
-    monto = models.DecimalField(
-        max_digits=14, decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"))])
-    aprobado = models.BooleanField(default=False)
-    referencia = models.CharField(max_length=64, blank=True)
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = _("reporte de ventas")
+        verbose_name_plural = _("reportes de ventas")
 
     def __str__(self):
-        return f"{self.get_tipo_display()} - ${self.monto} - orden #{self.orden_id}"
+        return f"#{self.pk} {self.get_estado_display()}"
