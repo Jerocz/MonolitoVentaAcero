@@ -1,0 +1,1050 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: monolito-venta-acero\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ventas/api.py:25
+#, python-format
+msgid "Servicio no disponible: %(servicio)s"
+msgstr "Service unavailable: %(servicio)s"
+
+#: ventas/api.py:46
+msgid "El cliente no existe."
+msgstr "The customer does not exist."
+
+#: ventas/forms.py:14 ventas/tasks.py:77
+#: ventas/templates/ventas/venta_form.html:166
+#: ventas/templates/ventas/venta_form.html:205
+msgid "Cliente"
+msgstr "Customer"
+
+#: ventas/forms.py:18
+msgid "Producto"
+msgstr "Product"
+
+#: ventas/forms.py:22
+msgid "Ancho (cm)"
+msgstr "Width (cm)"
+
+#: ventas/forms.py:27
+msgid "Largo (cm)"
+msgstr "Length (cm)"
+
+#: ventas/forms.py:32
+msgid "Cantidad"
+msgstr "Quantity"
+
+#: ventas/forms.py:15
+msgid "Elige el cliente que hace el pedido."
+msgstr "Choose the customer placing the order."
+
+#: ventas/forms.py:16
+msgid "El cliente elegido no existe."
+msgstr "The selected customer does not exist."
+
+#: ventas/forms.py:19
+msgid "Elige un producto del catálogo."
+msgstr "Choose a product from the catalog."
+
+#: ventas/forms.py:20
+msgid "El producto elegido no existe."
+msgstr "The selected product does not exist."
+
+#: ventas/forms.py:24
+msgid "Escribe el ancho en centímetros."
+msgstr "Enter the width in centimeters."
+
+#: ventas/forms.py:25
+msgid "El ancho debe ser un número, por ejemplo 70 o 70.5."
+msgstr "The width must be a number, for example 70 or 70.5."
+
+#: ventas/forms.py:29
+msgid "Escribe el largo en centímetros."
+msgstr "Enter the length in centimeters."
+
+#: ventas/forms.py:30
+msgid "El largo debe ser un número, por ejemplo 150."
+msgstr "The length must be a number, for example 150."
+
+#: ventas/forms.py:33
+msgid "Indica cuántas unidades necesitas."
+msgstr "Tell us how many units you need."
+
+#: ventas/forms.py:34
+msgid "La cantidad debe ser un número entero."
+msgstr "The quantity must be a whole number."
+
+#: ventas/forms.py:39
+msgid "Selecciona un cliente…"
+msgstr "Select a customer…"
+
+#: ventas/forms.py:41
+msgid "Selecciona un producto…"
+msgstr "Select a product…"
+
+#: ventas/forms.py:50
+#, python-format
+msgid "Para %(producto)s el ancho mínimo es %(minimo)s cm."
+msgstr "For %(producto)s the minimum width is %(minimo)s cm."
+
+#: ventas/models.py:43
+msgid "nombre"
+msgstr "name"
+
+#: ventas/models.py:44
+msgid "NIT o cédula"
+msgstr "Tax ID or national ID"
+
+#: ventas/models.py:45
+msgid "tipo"
+msgstr "type"
+
+#: ventas/models.py:46
+msgid "correo electrónico"
+msgstr "email"
+
+#: ventas/models.py:47
+msgid "teléfono"
+msgstr "phone"
+
+#: ventas/models.py:50 ventas/models.py:66
+msgid "cliente"
+msgstr "customer"
+
+#: ventas/models.py:51
+msgid "clientes"
+msgstr "customers"
+
+#: ventas/models.py:67
+msgid "fecha de creación"
+msgstr "creation date"
+
+#: ventas/models.py:68
+msgid "fecha de vencimiento"
+msgstr "expiration date"
+
+#: ventas/models.py:133 ventas/models.py:69
+msgid "estado"
+msgstr "status"
+
+#: ventas/models.py:71
+msgid "total"
+msgstr "total"
+
+#: ventas/models.py:74
+msgid "anticipo cobrado"
+msgstr "down payment charged"
+
+#: ventas/models.py:77
+msgid "orden de fabricación"
+msgstr "manufacturing order"
+
+#: ventas/models.py:80
+msgid "cotización"
+msgstr "quote"
+
+#: ventas/models.py:81
+msgid "cotizaciones"
+msgstr "quotes"
+
+#: ventas/models.py:94
+msgid "producto"
+msgstr "product"
+
+#: ventas/models.py:95
+msgid "nombre del producto"
+msgstr "product name"
+
+#: ventas/models.py:96
+msgid "tipo de producto"
+msgstr "product type"
+
+#: ventas/models.py:98
+msgid "ancho (cm)"
+msgstr "width (cm)"
+
+#: ventas/models.py:100
+msgid "largo (cm)"
+msgstr "length (cm)"
+
+#: ventas/models.py:101
+msgid "cantidad"
+msgstr "quantity"
+
+#: ventas/models.py:103
+msgid "subtotal"
+msgstr "subtotal"
+
+#: ventas/models.py:106
+msgid "ítem de cotización"
+msgstr "quote item"
+
+#: ventas/models.py:107
+msgid "ítems de cotización"
+msgstr "quote items"
+
+#: ventas/models.py:112
+msgid "destinatario"
+msgstr "recipient"
+
+#: ventas/models.py:113
+msgid "asunto"
+msgstr "subject"
+
+#: ventas/models.py:114
+msgid "mensaje"
+msgstr "message"
+
+#: ventas/models.py:115
+msgid "enviada"
+msgstr "sent"
+
+#: ventas/models.py:119
+msgid "notificación"
+msgstr "notification"
+
+#: ventas/models.py:120
+msgid "notificaciones"
+msgstr "notifications"
+
+#: ventas/models.py:134
+msgid "archivo"
+msgstr "file"
+
+#: ventas/models.py:135
+msgid "filas"
+msgstr "rows"
+
+#: ventas/models.py:136
+msgid "detalle"
+msgstr "detail"
+
+#: ventas/models.py:137
+msgid "solicitado"
+msgstr "requested"
+
+#: ventas/models.py:138
+msgid "terminado"
+msgstr "finished"
+
+#: ventas/models.py:142
+msgid "reporte de ventas"
+msgstr "sales report"
+
+#: ventas/models.py:143
+msgid "reportes de ventas"
+msgstr "sales reports"
+
+#: ventas/models.py:39
+msgid "Restaurante"
+msgstr "Restaurant"
+
+#: ventas/models.py:40
+msgid "Hotel"
+msgstr "Hotel"
+
+#: ventas/models.py:41
+msgid "Persona natural"
+msgstr "Individual"
+
+#: ventas/models.py:59
+msgid "Borrador"
+msgstr "Draft"
+
+#: ventas/models.py:60
+msgid "Enviada al cliente"
+msgstr "Sent to customer"
+
+#: ventas/models.py:61
+msgid "Aprobada"
+msgstr "Approved"
+
+#: ventas/models.py:62
+msgid "Rechazada"
+msgstr "Rejected"
+
+#: ventas/models.py:63
+msgid "Vencida"
+msgstr "Expired"
+
+#: ventas/models.py:129
+msgid "En cola"
+msgstr "Queued"
+
+#: ventas/models.py:130
+msgid "Listo"
+msgstr "Ready"
+
+#: ventas/models.py:131
+msgid "Con error"
+msgstr "Failed"
+
+#: ventas/serializers.py:23
+msgid "Debe incluir al menos un ítem."
+msgstr "It must include at least one item."
+
+#: ventas/services.py:54
+msgid "La cotización debe tener al menos un ítem."
+msgstr "The quote must have at least one item."
+
+#: ventas/services.py:86
+msgid "La pasarela rechazó el anticipo."
+msgstr "The payment gateway rejected the down payment."
+
+#: ventas/services.py:157
+msgid "La cotización de la orden no existe."
+msgstr "The order's quote does not exist."
+
+#: ventas/services.py:160
+msgid "La pasarela rechazó el saldo."
+msgstr "The payment gateway rejected the balance."
+
+#: ventas/tasks.py:36
+#, python-format
+msgid "Tu cotización %(ref)s fue aprobada"
+msgstr "Your quote %(ref)s was approved"
+
+#: ventas/tasks.py:37
+#, python-format
+msgid ""
+"Hola %(cliente)s:\n"
+"\n"
+"Recibimos el anticipo de $%(anticipo)s para la cotización %(ref)s (total $%(total)s). Tu pedido ya entró a la fila de fabricación.\n"
+"\n"
+"%(empresa)s"
+msgstr ""
+"Hello %(cliente)s,\n"
+"\n"
+"We received the down payment of $%(anticipo)s for quote %(ref)s (total $%(total)s). Your order is now in the manufacturing queue.\n"
+"\n"
+"%(empresa)s"
+
+#: ventas/tasks.py:51
+#, python-format
+msgid "Tu pedido %(ref)s avanzó a: %(etapa)s"
+msgstr "Your order %(ref)s moved to: %(etapa)s"
+
+#: ventas/tasks.py:52
+#, python-format
+msgid ""
+"Hola %(cliente)s:\n"
+"\n"
+"Tu pedido %(ref)s ahora está en la etapa \"%(etapa)s\".\n"
+"\n"
+"%(empresa)s"
+msgstr ""
+"Hello %(cliente)s,\n"
+"\n"
+"Your order %(ref)s is now in the \"%(etapa)s\" stage.\n"
+"\n"
+"%(empresa)s"
+
+#: ventas/tasks.py:89
+msgid "ms-pagos no respondió: columna de saldo vacía."
+msgstr "ms-pagos did not respond: balance column left empty."
+
+#: ventas/tasks.py:77 ventas/templates/ventas/venta_form.html:205
+msgid "Referencia"
+msgstr "Reference"
+
+#: ventas/tasks.py:77 ventas/templates/ventas/procesos.html:40
+msgid "Fecha"
+msgstr "Date"
+
+#: ventas/tasks.py:77
+msgid "Tipo de cliente"
+msgstr "Customer type"
+
+#: ventas/tasks.py:77 ventas/templates/ventas/procesos.html:22
+#: ventas/templates/ventas/venta_form.html:205
+#: ventas/templates/ventas/venta_form.html:89
+msgid "Estado"
+msgstr "Status"
+
+#: ventas/tasks.py:78
+msgid "Total (COP)"
+msgstr "Total (COP)"
+
+#: ventas/tasks.py:78
+msgid "Anticipo (COP)"
+msgstr "Down payment (COP)"
+
+#: ventas/tasks.py:78 ventas/templates/ventas/venta_form.html:166
+msgid "Orden"
+msgstr "Order"
+
+#: ventas/tasks.py:78
+msgid "Saldo pagado"
+msgstr "Balance paid"
+
+#: ventas/tasks.py:81
+msgid "Sí"
+msgstr "Yes"
+
+#: ventas/tasks.py:81
+msgid "No"
+msgstr "No"
+
+#: ventas/views.py:38
+#, python-format
+msgid ""
+"%(servicio)s no está disponible en este momento. Mostramos lo que se pudo "
+"cargar; intenta de nuevo en unos minutos."
+msgstr ""
+"%(servicio)s is not available right now. We are showing what could be loaded;"
+" please try again in a few minutes."
+
+#: ventas/views.py:132
+#, python-format
+msgid "La orden #%(id)s pasó a la etapa: %(etapa)s."
+msgstr "Order #%(id)s moved to the stage: %(etapa)s."
+
+#: ventas/views.py:139
+#, python-format
+msgid "Saldo de la orden #%(id)s pagado."
+msgstr "Balance of order #%(id)s paid."
+
+#: ventas/views.py:165
+#, python-format
+msgid ""
+"Reporte #%(id)s en cola. Se genera en segundo plano; recarga en unos "
+"segundos."
+msgstr ""
+"Report #%(id)s queued. It is generated in the background; reload in a few "
+"seconds."
+
+#: ventas/views.py:73
+msgid "El servicio de pagos"
+msgstr "The payments service"
+
+#: ventas/views.py:108
+msgid ""
+"No pudimos completar la cotización porque un servicio interno no responde. No"
+" se realizó ningún cobro; intenta de nuevo en unos minutos."
+msgstr ""
+"We could not complete the quote because an internal service is not "
+"responding. No charge was made; please try again in a few minutes."
+
+#: ventas/views.py:111
+#, python-format
+msgid "Cotización %(ref)s aprobada. Te enviaremos la confirmación por correo."
+msgstr "Quote %(ref)s approved. We will email you the confirmation."
+
+#: ventas/views.py:56
+msgid "El catálogo"
+msgstr "The catalog"
+
+#: ventas/views.py:71
+msgid "El seguimiento de fabricación"
+msgstr "Manufacturing tracking"
+
+#: ventas/views.py:125
+msgid "El servicio requerido"
+msgstr "The required service"
+
+#: ventas/infra/adaptadores_http.py:145 ventas/infra/adaptadores_http.py:153
+msgid "La orden no existe."
+msgstr "The order does not exist."
+
+#: ventas/infra/aliado.py:49
+msgid "Aún no se ha configurado la URL del servicio aliado (ALIADO_API_URL)."
+msgstr "The partner service URL has not been configured yet (ALIADO_API_URL)."
+
+#: ventas/infra/aliado.py:61
+msgid "El servicio del equipo aliado respondió con un error."
+msgstr "The partner team's service responded with an error."
+
+#: ventas/infra/aliado.py:58
+msgid "El servicio del equipo aliado no responde en este momento."
+msgstr "The partner team's service is not responding right now."
+
+#: monolito_venta_acero/settings.py:101
+msgid "Español"
+msgstr "Spanish"
+
+#: monolito_venta_acero/settings.py:102
+msgid "Inglés"
+msgstr "English"
+
+#: ventas/templates/404.html:3 ventas/templates/404.html:6
+msgid "Página no encontrada"
+msgstr "Page not found"
+
+#: ventas/templates/404.html:7
+msgid "La dirección que buscas no existe o cambió."
+msgstr "The address you are looking for does not exist or has changed."
+
+#: ventas/templates/404.html:8 ventas/templates/500.html:7
+msgid "Volver al inicio"
+msgstr "Back to home"
+
+#: ventas/templates/500.html:3
+msgid "Error del servidor"
+msgstr "Server error"
+
+#: ventas/templates/500.html:5
+msgid "Algo salió mal"
+msgstr "Something went wrong"
+
+#: ventas/templates/500.html:6
+msgid ""
+"Tuvimos un problema procesando tu solicitud. Intenta de nuevo en unos "
+"minutos."
+msgstr ""
+"We had a problem processing your request. Please try again in a few minutes."
+
+#: ventas/templates/ventas/base.html:13
+msgid "Saltar al contenido"
+msgstr "Skip to content"
+
+#: ventas/templates/ventas/base.html:19
+#: ventas/templates/ventas/venta_form.html:10
+msgid "Acero inoxidable"
+msgstr "Stainless steel"
+
+#: ventas/templates/ventas/base.html:22
+msgid "Navegación principal"
+msgstr "Main navigation"
+
+#: ventas/templates/ventas/base.html:23
+msgid "Catálogo"
+msgstr "Catalog"
+
+#: ventas/templates/ventas/base.html:24
+msgid "Cotizador"
+msgstr "Quote tool"
+
+#: ventas/templates/ventas/base.html:25
+msgid "Mis pedidos"
+msgstr "My orders"
+
+#: ventas/templates/ventas/base.html:26
+msgid "Cotizaciones"
+msgstr "Quotes"
+
+#: ventas/templates/ventas/base.html:27
+#: ventas/templates/ventas/integraciones.html:3
+#: ventas/templates/ventas/integraciones.html:7
+msgid "Integraciones"
+msgstr "Integrations"
+
+#: ventas/templates/ventas/base.html:28 ventas/templates/ventas/procesos.html:3
+msgid "Reportes"
+msgstr "Reports"
+
+#: ventas/templates/ventas/base.html:34
+msgid "Idioma"
+msgstr "Language"
+
+#: ventas/templates/ventas/base.html:41
+msgid "Cambiar"
+msgstr "Change"
+
+#: ventas/templates/ventas/base.html:61
+msgid "Acero inoxidable a la medida para cocinas, remodelaciones y hogares."
+msgstr "Custom stainless steel for kitchens, remodels and homes."
+
+#: ventas/templates/ventas/base.html:64
+msgid "Productos"
+msgstr "Products"
+
+#: ventas/templates/ventas/base.html:65
+msgid "Láminas a la medida"
+msgstr "Custom-cut sheets"
+
+#: ventas/templates/ventas/base.html:66
+msgid "Mesones"
+msgstr "Countertops"
+
+#: ventas/templates/ventas/base.html:67
+msgid "Campanas extractoras"
+msgstr "Extractor hoods"
+
+#: ventas/templates/ventas/base.html:68
+msgid "Freidoras"
+msgstr "Fryers"
+
+#: ventas/templates/ventas/base.html:71
+msgid "Contacto"
+msgstr "Contact"
+
+#: ventas/templates/ventas/base.html:72
+msgid "Medellín, Colombia"
+msgstr "Medellín, Colombia"
+
+#: ventas/templates/ventas/base.html:77
+msgid "Precios en pesos colombianos (COP)"
+msgstr "Prices in Colombian pesos (COP)"
+
+#: ventas/templates/ventas/integraciones.html:8
+msgid ""
+"Servicios que exponemos, servicios que consumimos del equipo aliado y la API "
+"de terceros."
+msgstr ""
+"Services we expose, services we consume from the partner team, and the third-"
+"party API."
+
+#: ventas/templates/ventas/integraciones.html:11
+msgid "Servicio que proveemos"
+msgstr "Service we provide"
+
+#: ventas/templates/ventas/integraciones.html:12
+msgid "Catálogo público en JSON"
+msgstr "Public JSON catalog"
+
+#: ventas/templates/ventas/integraciones.html:13
+msgid ""
+"Lo atiende el microservicio de catálogo a través del API Gateway. El equipo "
+"aliado lo consume con un GET."
+msgstr ""
+"It is served by the catalog microservice through the API Gateway. The partner"
+" team consumes it with a GET."
+
+#: ventas/templates/ventas/integraciones.html:18
+msgid "Servicio que consumimos"
+msgstr "Service we consume"
+
+#: ventas/templates/ventas/integraciones.html:21
+#, python-format
+msgid "Datos obtenidos de %(url)s"
+msgstr "Data retrieved from %(url)s"
+
+#: ventas/templates/ventas/integraciones.html:28
+msgid "El servicio aliado respondió sin datos."
+msgstr "The partner service responded with no data."
+
+#: ventas/templates/ventas/integraciones.html:38
+msgid "API de terceros (patrón Adapter)"
+msgstr "Third-party API (Adapter pattern)"
+
+#: ventas/templates/ventas/integraciones.html:39
+msgid "Tasa de cambio COP → USD"
+msgstr "Exchange rate COP → USD"
+
+#: ventas/templates/ventas/integraciones.html:43
+#, python-format
+msgid "Fuente: %(fuente)s."
+msgstr "Source: %(fuente)s."
+
+#: ventas/templates/ventas/integraciones.html:44
+#, python-format
+msgid "Actualizada: %(fecha)s."
+msgstr "Updated: %(fecha)s."
+
+#: ventas/templates/ventas/integraciones.html:45
+msgid "El proveedor externo no respondió; se muestra la tasa de respaldo."
+msgstr "The external provider did not respond; showing the fallback rate."
+
+#: ventas/templates/ventas/integraciones.html:48
+msgid "La tasa de cambio no está disponible."
+msgstr "The exchange rate is not available."
+
+#: ventas/templates/ventas/procesos.html:7
+msgid "Reportes y notificaciones"
+msgstr "Reports and notifications"
+
+#: ventas/templates/ventas/procesos.html:8
+msgid ""
+"Estas tareas las procesa un worker de Celery en segundo plano, usando Redis "
+"como Message Broker."
+msgstr ""
+"These tasks are processed in the background by a Celery worker, using Redis "
+"as the message broker."
+
+#: ventas/templates/ventas/procesos.html:11
+msgid "Reporte de ventas (CSV)"
+msgstr "Sales report (CSV)"
+
+#: ventas/templates/ventas/procesos.html:12
+msgid ""
+"Incluye todas las cotizaciones con su estado, total, anticipo y estado del "
+"saldo."
+msgstr ""
+"Includes every quote with its status, total, down payment and balance status."
+
+#: ventas/templates/ventas/procesos.html:15
+msgid "Enviando a la cola…"
+msgstr "Sending to the queue…"
+
+#: ventas/templates/ventas/procesos.html:15
+msgid "Generar reporte"
+msgstr "Generate report"
+
+#: ventas/templates/ventas/procesos.html:21
+msgid "Reportes solicitados"
+msgstr "Requested reports"
+
+#: ventas/templates/ventas/procesos.html:22
+msgid "Solicitado"
+msgstr "Requested"
+
+#: ventas/templates/ventas/procesos.html:22
+msgid "Filas"
+msgstr "Rows"
+
+#: ventas/templates/ventas/procesos.html:22
+msgid "Archivo"
+msgstr "File"
+
+#: ventas/templates/ventas/procesos.html:29
+msgid "Descargar"
+msgstr "Download"
+
+#: ventas/templates/ventas/procesos.html:32
+msgid "Aún no se ha solicitado ningún reporte."
+msgstr "No report has been requested yet."
+
+#: ventas/templates/ventas/procesos.html:39
+msgid "Notificaciones enviadas por el worker"
+msgstr "Notifications sent by the worker"
+
+#: ventas/templates/ventas/procesos.html:40
+msgid "Destinatario"
+msgstr "Recipient"
+
+#: ventas/templates/ventas/procesos.html:40
+msgid "Asunto"
+msgstr "Subject"
+
+#: ventas/templates/ventas/procesos.html:44
+msgid "Aún no hay notificaciones."
+msgstr "There are no notifications yet."
+
+#: ventas/templates/ventas/venta_form.html:3
+msgid "Acero inoxidable a la medida"
+msgstr "Custom-cut stainless steel"
+
+#: ventas/templates/ventas/venta_form.html:9
+msgid "Calibres 304 y 430 · Fabricación propia"
+msgstr "Grades 304 and 430 · In-house manufacturing"
+
+#: ventas/templates/ventas/venta_form.html:10
+msgid "cortado a tu medida"
+msgstr "cut to your measurements"
+
+#: ventas/templates/ventas/venta_form.html:11
+msgid ""
+"Láminas, mesones y campanas para tu cocina o tu remodelación. Nos dices las "
+"medidas, te damos el precio al instante y fabricamos en 20 días."
+msgstr ""
+"Sheets, countertops and hoods for your kitchen or remodel. You give us the "
+"measurements, we give you the price instantly and build it in 20 days."
+
+#: ventas/templates/ventas/venta_form.html:13
+msgid "Calcular mi precio"
+msgstr "Calculate my price"
+
+#: ventas/templates/ventas/venta_form.html:14
+msgid "Ver el catálogo"
+msgstr "See the catalog"
+
+#: ventas/templates/ventas/venta_form.html:17
+msgid "20 días"
+msgstr "20 days"
+
+#: ventas/templates/ventas/venta_form.html:17
+msgid "de fabricación"
+msgstr "of manufacturing"
+
+#: ventas/templates/ventas/venta_form.html:18
+msgid "de anticipo, resto al entregar"
+msgstr "down payment, the rest on delivery"
+
+#: ventas/templates/ventas/venta_form.html:19
+msgid "15 días"
+msgstr "15 days"
+
+#: ventas/templates/ventas/venta_form.html:19
+msgid "de vigencia de la cotización"
+msgstr "quote validity"
+
+#: ventas/templates/ventas/venta_form.html:22
+msgid "Cocina en acero inoxidable"
+msgstr "Stainless steel kitchen"
+
+#: ventas/templates/ventas/venta_form.html:28
+msgid "Soldadura TIG · Pulido espejo y satinado · Corte a la medida"
+msgstr "TIG welding · Mirror and satin polish · Custom cutting"
+
+#: ventas/templates/ventas/venta_form.html:29
+msgid "Medellín y Valle de Aburrá"
+msgstr "Medellín and the Aburrá Valley"
+
+#: ventas/templates/ventas/venta_form.html:34
+msgid "Lo que fabricamos"
+msgstr "What we make"
+
+#: ventas/templates/ventas/venta_form.html:36
+msgid ""
+"Precios por metro cuadrado en pesos colombianos. El precio final depende de "
+"tus medidas."
+msgstr ""
+"Prices per square meter in Colombian pesos. The final price depends on your "
+"measurements."
+
+#: ventas/templates/ventas/venta_form.html:37
+#, python-format
+msgid "Equivalente en dólares según %(fuente)s."
+msgstr "Dollar equivalent according to %(fuente)s."
+
+#: ventas/templates/ventas/venta_form.html:45
+msgid ""
+"Lámina lisa para forrar muros, salpicaderos y mesas de trabajo. Se cobra el "
+"área real."
+msgstr ""
+"Flat sheet to cover walls, backsplashes and work tables. You pay for the "
+"actual area."
+
+#: ventas/templates/ventas/venta_form.html:46
+msgid ""
+"Mesón con refuerzo estructural y bordes doblados, listo para instalar sobre "
+"mueble."
+msgstr ""
+"Countertop with structural reinforcement and folded edges, ready to install "
+"on a cabinet."
+
+#: ventas/templates/ventas/venta_form.html:47
+msgid ""
+"Campana con ductería incluida, para estufas residenciales o comerciales."
+msgstr "Hood with ductwork included, for residential or commercial stoves."
+
+#: ventas/templates/ventas/venta_form.html:48
+msgid "Equipo estándar en acero 304. No se fabrica a la medida."
+msgstr "Standard equipment in 304 steel. Not made to measure."
+
+#: ventas/templates/ventas/venta_form.html:52
+msgid "Se vende"
+msgstr "Sold"
+
+#: ventas/templates/ventas/venta_form.html:53
+msgid "Por m² a la medida"
+msgstr "Per m², made to measure"
+
+#: ventas/templates/ventas/venta_form.html:53
+msgid "Por unidad"
+msgstr "Per unit"
+
+#: ventas/templates/ventas/venta_form.html:56
+msgid "Disponible"
+msgstr "Available"
+
+#: ventas/templates/ventas/venta_form.html:57
+msgid "unidades"
+msgstr "units"
+
+#: ventas/templates/ventas/venta_form.html:60
+msgid "unidad"
+msgstr "unit"
+
+#: ventas/templates/ventas/venta_form.html:63
+msgid "Cotizar este producto"
+msgstr "Quote this product"
+
+#: ventas/templates/ventas/venta_form.html:66
+msgid "El catálogo no tiene productos para mostrar en este momento."
+msgstr "The catalog has no products to show right now."
+
+#: ventas/templates/ventas/venta_form.html:72
+msgid "Cómo funciona"
+msgstr "How it works"
+
+#: ventas/templates/ventas/venta_form.html:73
+msgid "Del clic al montaje, sin llamadas para saber cuánto cuesta."
+msgstr "From click to installation, no calls needed to know the price."
+
+#: ventas/templates/ventas/venta_form.html:75
+msgid "Cotizas en línea"
+msgstr "You quote online"
+
+#: ventas/templates/ventas/venta_form.html:75
+msgid ""
+"Eliges el producto, escribes ancho y largo, y ves el precio en pesos al "
+"instante."
+msgstr ""
+"Pick the product, enter width and length, and see the price in pesos "
+"instantly."
+
+#: ventas/templates/ventas/venta_form.html:76
+#, python-format
+msgid "Pagas el 50%%"
+msgstr "You pay 50%%"
+
+#: ventas/templates/ventas/venta_form.html:76
+msgid ""
+"Con el anticipo aprobado tu orden entra a la fila de fabricación. El saldo se"
+" paga al final."
+msgstr ""
+"Once the down payment is approved your order enters the manufacturing queue. "
+"The balance is paid at the end."
+
+#: ventas/templates/ventas/venta_form.html:77
+msgid "Fabricamos"
+msgstr "We build it"
+
+#: ventas/templates/ventas/venta_form.html:77
+msgid ""
+"Corte, soldadura y pulido en nuestro taller. Puedes ver en qué etapa va tu "
+"pedido."
+msgstr ""
+"Cutting, welding and polishing in our workshop. You can see which stage your "
+"order is in."
+
+#: ventas/templates/ventas/venta_form.html:78
+msgid "Entregamos"
+msgstr "We deliver"
+
+#: ventas/templates/ventas/venta_form.html:78
+msgid ""
+"Llevamos e instalamos en tu cocina. La orden queda marcada como entregada."
+msgstr ""
+"We deliver and install it in your kitchen. The order is marked as delivered."
+
+#: ventas/templates/ventas/venta_form.html:83
+msgid "Cotiza a la medida"
+msgstr "Get a custom quote"
+
+#: ventas/templates/ventas/venta_form.html:84
+#, python-format
+msgid ""
+"Ancho mínimo 60 cm en productos a la medida. Al cotizar se cobra el anticipo "
+"del 50%% y se abre tu orden de fabricación."
+msgstr ""
+"Minimum width 60 cm for custom products. Quoting charges the 50%% down "
+"payment and opens your manufacturing order."
+
+#: ventas/templates/ventas/venta_form.html:88
+#, python-format
+msgid "Cotización %(ref)s"
+msgstr "Quote %(ref)s"
+
+#: ventas/templates/ventas/venta_form.html:205
+#: ventas/templates/ventas/venta_form.html:90
+msgid "Total"
+msgstr "Total"
+
+#: ventas/templates/ventas/venta_form.html:91
+#, python-format
+msgid "Anticipo cobrado (50%%)"
+msgstr "Down payment charged (50%%)"
+
+#: ventas/templates/ventas/venta_form.html:94
+#, python-format
+msgid "Se generó la orden de fabricación #%(orden)s."
+msgstr "Manufacturing order #%(orden)s was created."
+
+#: ventas/templates/ventas/venta_form.html:96
+msgid "La orden de fabricación se está creando en segundo plano."
+msgstr "The manufacturing order is being created in the background."
+
+#: ventas/templates/ventas/venta_form.html:103
+msgid "No podemos fabricarlo así:"
+msgstr "We can't build it like this:"
+
+#: ventas/templates/ventas/venta_form.html:107
+msgid "Revisa los campos marcados en rojo."
+msgstr "Check the fields marked in red."
+
+#: ventas/templates/ventas/venta_form.html:113
+msgid "Paso 1 · Cliente"
+msgstr "Step 1 · Customer"
+
+#: ventas/templates/ventas/venta_form.html:123
+msgid "Paso 2 · Producto y medidas"
+msgstr "Step 2 · Product and measurements"
+
+#: ventas/templates/ventas/venta_form.html:134
+msgid "mín. 60"
+msgstr "min. 60"
+
+#: ventas/templates/ventas/venta_form.html:155
+msgid "Procesando pago…"
+msgstr "Processing payment…"
+
+#: ventas/templates/ventas/venta_form.html:155
+#, python-format
+msgid "Cotizar y pagar anticipo del 50%%"
+msgstr "Quote and pay the 50%% down payment"
+
+#: ventas/templates/ventas/venta_form.html:160
+msgid "Órdenes de fabricación"
+msgstr "Manufacturing orders"
+
+#: ventas/templates/ventas/venta_form.html:161
+msgid "Etapa por etapa, desde la cola hasta la entrega."
+msgstr "Stage by stage, from the queue to delivery."
+
+#: ventas/templates/ventas/venta_form.html:164
+msgid "Últimas órdenes registradas en el servicio de fabricación"
+msgstr "Latest orders recorded in the manufacturing service"
+
+#: ventas/templates/ventas/venta_form.html:166
+msgid "Etapa"
+msgstr "Stage"
+
+#: ventas/templates/ventas/venta_form.html:166
+msgid "Progreso"
+msgstr "Progress"
+
+#: ventas/templates/ventas/venta_form.html:166
+msgid "Acciones"
+msgstr "Actions"
+
+#: ventas/templates/ventas/venta_form.html:173
+msgid "saldo: sin información"
+msgstr "balance: no information"
+
+#: ventas/templates/ventas/venta_form.html:173
+msgid "saldo pagado"
+msgstr "balance paid"
+
+#: ventas/templates/ventas/venta_form.html:173
+msgid "saldo pendiente"
+msgstr "balance pending"
+
+#: ventas/templates/ventas/venta_form.html:177
+#, python-format
+msgid "Progreso %(p)s%%"
+msgstr "Progress %(p)s%%"
+
+#: ventas/templates/ventas/venta_form.html:180
+#, python-format
+msgid "Entrega estimada %(fecha)s"
+msgstr "Estimated delivery %(fecha)s"
+
+#: ventas/templates/ventas/venta_form.html:185
+msgid "Avanzar etapa"
+msgstr "Advance stage"
+
+#: ventas/templates/ventas/venta_form.html:188
+#, python-format
+msgid "¿Confirmas el cobro del saldo de la orden #%(id)s?"
+msgstr "Do you confirm charging the balance of order #%(id)s?"
+
+#: ventas/templates/ventas/venta_form.html:188
+msgid "Pagar saldo"
+msgstr "Pay balance"
+
+#: ventas/templates/ventas/venta_form.html:194
+msgid "Aún no hay órdenes. Cotiza arriba para crear la primera."
+msgstr "No orders yet. Get a quote above to create the first one."
+
+#: ventas/templates/ventas/venta_form.html:201
+msgid "Últimas cotizaciones"
+msgstr "Latest quotes"
+
+#: ventas/templates/ventas/venta_form.html:202
+msgid "Cada cotización tiene 15 días de vigencia con el precio bloqueado."
+msgstr "Each quote is valid for 15 days with the price locked."
+
+#: ventas/templates/ventas/venta_form.html:205
+msgid "Vence"
+msgstr "Expires"
+
+#: ventas/templates/ventas/venta_form.html:215
+msgid "Aún no hay cotizaciones."
+msgstr "There are no quotes yet."
