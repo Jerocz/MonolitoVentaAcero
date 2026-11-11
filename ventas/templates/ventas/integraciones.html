@@ -1,0 +1,52 @@
+{% extends "ventas/base.html" %}
+{% load i18n humanize %}
+{% block titulo %}{% translate "Integraciones" %} — {{ empresa.NOMBRE }}{% endblock %}
+
+{% block contenido %}
+<section class="blk wrap">
+  <h2>{% translate "Integraciones" %}</h2>
+  <p class="sub">{% translate "Servicios que exponemos, servicios que consumimos del equipo aliado y la API de terceros." %}</p>
+
+  <div class="panel">
+    <div class="tag">{% translate "Servicio que proveemos" %}</div>
+    <h3>{% translate "Catálogo público en JSON" %}</h3>
+    <p class="sub" style="margin-bottom:12px">{% translate "Lo atiende el microservicio de catálogo a través del API Gateway. El equipo aliado lo consume con un GET." %}</p>
+    <p><a class="codigo" href="{{ url_publica }}">GET {{ url_publica }}</a></p>
+  </div>
+
+  <div class="panel">
+    <div class="tag">{% translate "Servicio que consumimos" %}</div>
+    <h3>{{ aliado.nombre }}</h3>
+    {% if aliado.disponible %}
+      <p class="sub" style="margin-bottom:12px">{% blocktranslate with url=aliado.url %}Datos obtenidos de {{ url }}{% endblocktranslate %}</p>
+      <div class="tabla-scroll">
+      <table>
+        {% for fila in aliado.elementos %}
+          {% if forloop.first %}<tr>{% for campo in fila %}<th scope="col">{{ campo }}</th>{% endfor %}</tr>{% endif %}
+          <tr>{% for valor in fila.values %}<td>{{ valor }}</td>{% endfor %}</tr>
+        {% empty %}
+          <tr><td class="vacio">{% translate "El servicio aliado respondió sin datos." %}</td></tr>
+        {% endfor %}
+      </table>
+      </div>
+    {% else %}
+      <div class="alerta warning">{{ aliado.mensaje }}</div>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <div class="tag">{% translate "API de terceros (patrón Adapter)" %}</div>
+    <h3>{% translate "Tasa de cambio COP → USD" %}</h3>
+    {% if tasa %}
+      <p class="price">1 COP = {{ tasa.valor|floatformat:6 }} USD</p>
+      <p class="sub" style="margin:8px 0 0">
+        {% blocktranslate with fuente=tasa.fuente %}Fuente: {{ fuente }}.{% endblocktranslate %}
+        {% if tasa.actualizada %}{% blocktranslate with fecha=tasa.actualizada|date:"SHORT_DATETIME_FORMAT" %}Actualizada: {{ fecha }}.{% endblocktranslate %}{% endif %}
+        {% if tasa.es_respaldo %}{% translate "El proveedor externo no respondió; se muestra la tasa de respaldo." %}{% endif %}
+      </p>
+    {% else %}
+      <div class="alerta warning">{% translate "La tasa de cambio no está disponible." %}</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

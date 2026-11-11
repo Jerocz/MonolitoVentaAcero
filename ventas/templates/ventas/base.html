@@ -1,0 +1,82 @@
+{% load static i18n %}{% get_current_language as IDIOMA %}<!DOCTYPE html>
+<html lang="{{ IDIOMA }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{{ empresa.NOMBRE }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'ventas/estilos.css' %}">
+</head>
+<body>
+<a class="skip" href="#contenido">{% translate "Saltar al contenido" %}</a>
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="{% url 'cotizacion_form' %}">
+      <img src="{% static 'ventas/logo-lockup.png' %}" alt="{{ empresa.NOMBRE }}">
+      <span>{% translate "Acero inoxidable" %}</span>
+    </a>
+    {% with ruta=request.resolver_match.url_name %}
+    <nav aria-label="{% translate 'Navegación principal' %}">
+      <a href="{% url 'cotizacion_form' %}#catalogo">{% translate "Catálogo" %}</a>
+      <a href="{% url 'cotizacion_form' %}#cotizador">{% translate "Cotizador" %}</a>
+      <a href="{% url 'cotizacion_form' %}#ordenes">{% translate "Mis pedidos" %}</a>
+      <a href="{% url 'cotizacion_form' %}#cotizaciones">{% translate "Cotizaciones" %}</a>
+      <a href="{% url 'integraciones' %}"{% if ruta == 'integraciones' %} aria-current="page"{% endif %}>{% translate "Integraciones" %}</a>
+      <a href="{% url 'procesos' %}"{% if ruta == 'procesos' %} aria-current="page"{% endif %}>{% translate "Reportes" %}</a>
+    </nav>
+    {% endwith %}
+    <form class="idioma" action="{% url 'set_language' %}" method="post">
+      {% csrf_token %}
+      <input name="next" type="hidden" value="{{ request.get_full_path }}">
+      <label for="selector-idioma">{% translate "Idioma" %}</label>
+      <select id="selector-idioma" name="language">
+        {% get_available_languages as IDIOMAS %}{% get_language_info_list for IDIOMAS as lista_idiomas %}
+        {% for idioma in lista_idiomas %}
+        <option value="{{ idioma.code }}"{% if idioma.code == IDIOMA %} selected{% endif %}>{{ idioma.name_local|capfirst }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn-sm" type="submit">{% translate "Cambiar" %}</button>
+    </form>
+  </div>
+</header>
+
+{% if messages or avisos %}
+<div class="wrap alertas" role="status" aria-live="polite">
+  {% for m in messages %}<div class="alerta {{ m.tags }}">{{ m }}</div>{% endfor %}
+  {% for aviso in avisos %}<div class="alerta warning">{{ aviso }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<main id="contenido" tabindex="-1">
+{% block contenido %}{% endblock %}
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="col">
+      <img src="{% static 'ventas/logo-lockup.png' %}" alt="{{ empresa.NOMBRE }}">
+      <p style="margin:12px 0 0;font-size:14px;color:#BDB7AA;max-width:34ch">{% translate "Acero inoxidable a la medida para cocinas, remodelaciones y hogares." %}</p>
+    </div>
+    <div class="col">
+      <div class="mono" style="margin-bottom:12px">{% translate "Productos" %}</div>
+      <a href="{% url 'cotizacion_form' %}#catalogo">{% translate "Láminas a la medida" %}</a>
+      <a href="{% url 'cotizacion_form' %}#catalogo">{% translate "Mesones" %}</a>
+      <a href="{% url 'cotizacion_form' %}#catalogo">{% translate "Campanas extractoras" %}</a>
+      <a href="{% url 'cotizacion_form' %}#catalogo">{% translate "Freidoras" %}</a>
+    </div>
+    <div class="col">
+      <div class="mono" style="margin-bottom:12px">{% translate "Contacto" %}</div>
+      <span>{% translate "Medellín, Colombia" %}</span>
+      <a href="tel:{{ empresa.TELEFONO_TEL }}">{{ empresa.TELEFONO }}</a>
+      <a href="mailto:{{ empresa.CORREO }}">{{ empresa.CORREO }}</a>
+    </div>
+  </div>
+  <div class="legal"><div class="wrap">© 2026 {{ empresa.NOMBRE }} · {% translate "Precios en pesos colombianos (COP)" %}</div></div>
+</footer>
+
+<script src="{% static 'ventas/app.js' %}" defer></script>
+</body>
+</html>

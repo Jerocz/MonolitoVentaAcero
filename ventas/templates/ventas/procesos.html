@@ -1,0 +1,49 @@
+{% extends "ventas/base.html" %}
+{% load i18n %}
+{% block titulo %}{% translate "Reportes" %} — {{ empresa.NOMBRE }}{% endblock %}
+
+{% block contenido %}
+<section class="blk wrap">
+  <h2>{% translate "Reportes y notificaciones" %}</h2>
+  <p class="sub">{% translate "Estas tareas las procesa un worker de Celery en segundo plano, usando Redis como Message Broker." %}</p>
+
+  <div class="panel">
+    <h3>{% translate "Reporte de ventas (CSV)" %}</h3>
+    <p class="sub" style="margin-bottom:14px">{% translate "Incluye todas las cotizaciones con su estado, total, anticipo y estado del saldo." %}</p>
+    <form method="post" action="{% url 'procesos' %}">
+      {% csrf_token %}
+      <button class="cta" type="submit" data-enviando="{% translate 'Enviando a la cola…' %}">{% translate "Generar reporte" %}</button>
+    </form>
+  </div>
+
+  <div class="tabla-scroll" style="margin-bottom:36px">
+  <table>
+    <caption class="mono" style="text-align:left;padding:0 0 10px">{% translate "Reportes solicitados" %}</caption>
+    <tr><th scope="col">#</th><th scope="col">{% translate "Estado" %}</th><th scope="col">{% translate "Solicitado" %}</th><th scope="col">{% translate "Filas" %}</th><th scope="col" class="right">{% translate "Archivo" %}</th></tr>
+    {% for r in reportes %}
+    <tr>
+      <td>#{{ r.id }}</td>
+      <td><span class="badge b-{{ r.estado }}">{{ r.get_estado_display }}</span>{% if r.detalle %}<div class="estado-cola">{{ r.detalle }}</div>{% endif %}</td>
+      <td>{{ r.solicitado|date:"SHORT_DATETIME_FORMAT" }}</td>
+      <td>{{ r.filas }}</td>
+      <td class="right">{% if r.archivo %}<a class="btn-sm" href="{{ r.archivo.url }}" download>{% translate "Descargar" %}</a>{% else %}<span class="vacio">—</span>{% endif %}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="vacio">{% translate "Aún no se ha solicitado ningún reporte." %}</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+
+  <div class="tabla-scroll">
+  <table>
+    <caption class="mono" style="text-align:left;padding:0 0 10px">{% translate "Notificaciones enviadas por el worker" %}</caption>
+    <tr><th scope="col">{% translate "Fecha" %}</th><th scope="col">{% translate "Destinatario" %}</th><th scope="col">{% translate "Asunto" %}</th></tr>
+    {% for n in notificaciones %}
+    <tr><td>{{ n.creada|date:"SHORT_DATETIME_FORMAT" }}</td><td>{{ n.destinatario }}</td><td>{{ n.asunto }}</td></tr>
+    {% empty %}
+    <tr><td colspan="3" class="vacio">{% translate "Aún no hay notificaciones." %}</td></tr>
+    {% endfor %}
+  </table>
+  </div>
+</section>
+{% endblock %}

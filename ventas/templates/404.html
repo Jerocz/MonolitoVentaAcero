@@ -1,0 +1,10 @@
+{% extends "ventas/base.html" %}
+{% load i18n %}
+{% block titulo %}{% translate "Página no encontrada" %}{% endblock %}
+{% block contenido %}
+<section class="blk wrap">
+  <h2>{% translate "Página no encontrada" %}</h2>
+  <p class="sub">{% translate "La dirección que buscas no existe o cambió." %}</p>
+  <a class="cta" href="{% url 'cotizacion_form' %}">{% translate "Volver al inicio" %}</a>
+</section>
+{% endblock %}
