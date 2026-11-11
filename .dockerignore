@@ -1,0 +1,13 @@
+.git
+**/__pycache__
+**/*.pyc
+.venv
+venv
+*.sqlite3
+media/
+staticfiles/
+microservicios/
+gateway/
+deploy/
+docs/
+.env

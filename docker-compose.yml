@@ -1,0 +1,154 @@
+# Ecosistema completo (Entrega 2): Nginx + Django + 3 microservicios Flask +
+# PostgreSQL + Redis + worker y beat de Celery.
+#
+#   cp .env.example .env      # y cambia las claves
+#   docker compose up -d --build
+#   http://<IP-elastica>/     # solo el gateway publica un puerto (80)
+
+name: integrales-torres
+
+x-django: &django
+  build: .
+  image: integrales-torres/monolito:latest
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql://ventas:${VENTAS_DB_PASSWORD:?define VENTAS_DB_PASSWORD en .env}@db:5432/ventas
+    REDIS_URL: redis://redis:6379/2
+    CELERY_BROKER_URL: redis://redis:6379/0
+    CELERY_RESULT_BACKEND: redis://redis:6379/1
+    MS_CATALOGO_URL: http://ms_catalogo:5000
+    MS_PAGOS_URL: http://ms_pagos:5000
+    MS_FABRICACION_URL: http://ms_fabricacion:5000
+  volumes:
+    - media_data:/srv/media
+  networks: [interna, datos]
+  depends_on:
+    db: { condition: service_healthy }
+    redis: { condition: service_healthy }
+
+x-flask: &flask
+  restart: unless-stopped
+  networks: [interna, datos]
+  depends_on:
+    db: { condition: service_healthy }
+
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_data:/srv/static:ro
+      - media_data:/srv/media:ro
+    networks: [interna]
+    depends_on:
+      web: { condition: service_healthy }
+      ms_catalogo: { condition: service_healthy }
+      ms_pagos: { condition: service_healthy }
+      ms_fabricacion: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/gateway/salud"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+  web:
+    <<: *django
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             python seed.py &&
+             gunicorn monolito_venta_acero.wsgi:application --bind 0.0.0.0:8000
+             --workers 3 --timeout 60 --access-logfile -"
+    volumes:
+      - media_data:/srv/media
+      - static_data:/srv/static
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/salud/vivo/', timeout=2).status == 200 else 1)"]
+      interval: 15s
+      timeout: 4s
+      start_period: 40s
+      retries: 3
+
+  worker:
+    <<: *django
+    command: celery -A monolito_venta_acero worker --loglevel=info --concurrency=2
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      web: { condition: service_healthy }   # espera a que corran las migraciones
+
+  beat:
+    <<: *django
+    command: celery -A monolito_venta_acero beat --loglevel=info --schedule /tmp/celerybeat-schedule
+    depends_on:
+      redis: { condition: service_healthy }
+      web: { condition: service_healthy }
+
+  ms_catalogo:
+    <<: *flask
+    build: ./microservicios/ms_catalogo
+    image: integrales-torres/ms-catalogo:latest
+    environment:
+      DATABASE_URL: postgresql+psycopg://catalogo:${CATALOGO_DB_PASSWORD:?define CATALOGO_DB_PASSWORD}@db:5432/catalogo
+
+  ms_pagos:
+    <<: *flask
+    build: ./microservicios/ms_pagos
+    image: integrales-torres/ms-pagos:latest
+    environment:
+      DATABASE_URL: postgresql+psycopg://pagos:${PAGOS_DB_PASSWORD:?define PAGOS_DB_PASSWORD}@db:5432/pagos
+      ENV_TYPE: ${ENV_TYPE:-MOCK}
+
+  ms_fabricacion:
+    <<: *flask
+    build: ./microservicios/ms_fabricacion
+    image: integrales-torres/ms-fabricacion:latest
+    environment:
+      DATABASE_URL: postgresql+psycopg://fabricacion:${FABRICACION_DB_PASSWORD:?define FABRICACION_DB_PASSWORD}@db:5432/fabricacion
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ventas
+      POSTGRES_USER: ventas
+      POSTGRES_PASSWORD: ${VENTAS_DB_PASSWORD}
+      CATALOGO_DB_PASSWORD: ${CATALOGO_DB_PASSWORD}
+      PAGOS_DB_PASSWORD: ${PAGOS_DB_PASSWORD}
+      FABRICACION_DB_PASSWORD: ${FABRICACION_DB_PASSWORD}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./docker/postgres/01-crear-bases.sh:/docker-entrypoint-initdb.d/01-crear-bases.sh:ro
+    networks: [datos]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ventas -d ventas"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks: [datos]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+networks:
+  interna:   # gateway <-> aplicaciones
+  datos:     # aplicaciones <-> PostgreSQL / Redis (el gateway NO tiene acceso)
+
+volumes:
+  pg_data:
+  redis_data:
+  static_data:
+  media_data:
