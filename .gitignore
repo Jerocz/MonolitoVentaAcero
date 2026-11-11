@@ -9,3 +9,4 @@ media/
 staticfiles/
 microservicios/**/*.sqlite3
 ventas/tests/_plantilla_prueba.html
+db.sqlite3

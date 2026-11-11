@@ -60,7 +60,7 @@ services:
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
-             python seed.py &&
+             python manage.py sembrar_datos &&
              gunicorn monolito_venta_acero.wsgi:application --bind 0.0.0.0:8000
              --workers 3 --timeout 60 --access-logfile -"
     volumes:
