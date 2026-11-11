@@ -92,7 +92,7 @@ flowchart LR
 | Reglas de la cotización (Builder) | `ventas/domain/builders.py` | **ms-catalogo** `app/dominio/cotizador.py` |
 | Reserva y liberación de stock | — (descontaba directo) | **ms-catalogo** `/reservas` (nuevo, con compensación) |
 | Pasarelas real/mock + Factory | `ventas/infra/` | **ms-pagos** `app/infra/pasarelas.py` |
-| Anticipo 50 % y saldo | `services.py` | **ms-pagos** `app/dominio/reglas.py` |
+| Anticipo 50 % y saldo | `ventas/services.py` | **ms-pagos** `app/dominio/reglas.py` |
 | Registro de pagos | `models.Pago` | **ms-pagos** (`cobros`) |
 | Órdenes y secuencia de etapas | `models.OrdenFabricacion`, `reglas.py` | **ms-fabricacion** (`ordenes`, `eventos_orden`) |
 | Clientes, cotizaciones | Django | Django (orquestador) |
@@ -203,13 +203,13 @@ classDiagram
     Contenedor ..> TasaCambioConRespaldo : crea
 ```
 
-* **Puertos**: `ventas/domain/puertos.py` (abstracciones + DTOs).
-* **Adaptadores**: `ventas/infra/` (`adaptadores_http.py`, `terceros.py`, `aliado.py`, `cola_tareas.py`).
+* **Puertos**: `ventas/domain/puertos.py` (abstracciones) y `ventas/domain/dtos.py` (datos).
+* **Adaptadores**: `ventas/infra/microservicios/` (catálogo, pagos, fabricación), `ventas/infra/externos/` (tasa de cambio, aliado) y `ventas/infra/mensajeria/` (Celery).
 * **Composition root**: `ventas/infra/contenedor.py`. Las pruebas inyectan dobles en memoria (`ventas/tests/dobles.py`).
 
 ### Patrón Adapter con la API de terceros
 
-`ExchangeRateApiAdapter` (en `ventas/infra/terceros.py`) recibe el formato propio
+`ExchangeRateApiAdapter` (en `ventas/infra/externos/tasa_cambio.py`) recibe el formato propio
 del proveedor (`{"result": "success", "rates": {"USD": ...}}`) y lo convierte
 en el `TasaCambioDTO` del dominio. Nada fuera del adaptador conoce al proveedor.
 `TasaCambioConRespaldo` agrega *fallback*: si el proveedor no responde se usa
@@ -240,12 +240,12 @@ flowchart LR
 
 | Mecanismo | Dónde |
 |---|---|
-| Timeout en toda llamada HTTP | `ventas/infra/http.py` (`HTTP_TIMEOUT_SEGUNDOS`) |
-| Reintentos con backoff (502/503/504 y errores de red) | `ventas/infra/http.py` (urllib3 `Retry`) |
-| Circuit Breaker por servicio | `ventas/infra/http.py` (`CircuitBreaker`) |
+| Timeout en toda llamada HTTP | `ventas/infra/http/cliente.py` (`HTTP_TIMEOUT_SEGUNDOS`) |
+| Reintentos con backoff (502/503/504 y errores de red) | `ventas/infra/http/cliente.py` (urllib3 `Retry`) |
+| Circuit Breaker por servicio | `ventas/infra/http/circuit_breaker.py` (`CircuitBreaker`) |
 | Idempotencia en escrituras | ms-catalogo `/reservas`, ms-pagos `/anticipos` `/saldos`, ms-fabricacion `/ordenes` |
-| Saga con compensación | `CotizacionService._compensar` → `/reservas/<ref>/liberar` |
-| Degradación controlada en la UI | `ventas/views.py` (avisos cuando un servicio no responde) |
+| Saga con compensación | `ventas/services/cotizacion.py` (`_compensar`) → `/reservas/<ref>/liberar` |
+| Degradación controlada en la UI | `ventas/views/` (avisos cuando un servicio no responde) |
 | Fallback de la API de terceros | `TasaCambioConRespaldo` |
 | Healthchecks y reinicio automático | `docker-compose.yml` (`healthcheck`, `restart: unless-stopped`) |
 | Gateway: rate limit, reintento upstream y 503 JSON | `gateway/nginx.conf` |
